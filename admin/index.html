@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>๐EP๐ GVG Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap');
+
+    :root {
+      --bg-deep: #0a0d16;
+      --bg-mid: #131a2c;
+      --panel: rgba(19, 24, 41, 0.55);
+      --panel-soft: rgba(19, 24, 41, 0.38);
+      --border-soft: rgba(255, 255, 255, 0.07);
+      --gold: #c9a24d;
+      --gold-light: #e3c785;
+      --gold-dim: rgba(201, 162, 77, 0.16);
+      --gold-border: rgba(201, 162, 77, 0.28);
+      --ink: #eef0f5;
+      --ink-dim: #8b93a7;
+      --ink-faint: #5c6478;
+      --rose: #d98a83;
+      --sage: #8fae93;
+    }
+
+    * { font-family: 'Prompt', sans-serif; -webkit-tap-highlight-color: transparent; }
+    .font-display { font-family: 'Cormorant Garamond', serif; letter-spacing: 0.03em; }
+
+    body {
+      background: linear-gradient(170deg, var(--bg-deep) 0%, var(--bg-mid) 55%, var(--bg-deep) 100%);
+      min-height: 100dvh;
+      color: var(--ink);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .glass { background: var(--panel); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid var(--border-soft); }
+    .glass-card { background: var(--panel-soft); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid var(--border-soft); }
+    .gold-text { background: linear-gradient(135deg, var(--gold), var(--gold-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .text-gold { color: var(--gold-light); }
+    .text-gold-dim { color: var(--ink-dim); }
+    .gold-border { border: 1px solid var(--gold-border); }
+
+    .btn-gold { background: var(--gold); color: var(--bg-deep); transition: all 0.25s ease; }
+    .btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 10px 22px rgba(201, 162, 77, 0.16); }
+    .btn-gold:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .btn-outline { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-soft); color: var(--ink); transition: all 0.2s ease; }
+    .btn-outline:hover { border-color: var(--gold-border); color: var(--gold-light); }
+    .btn-outline:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-danger { background: rgba(217, 138, 131, 0.1); border: 1px solid rgba(217, 138, 131, 0.28); color: var(--rose); transition: all 0.2s ease; }
+    .btn-danger:hover { background: rgba(217, 138, 131, 0.18); }
+
+    .input-dark {
+      background: rgba(8, 11, 20, 0.55); border: 1px solid var(--border-soft);
+      color: var(--ink); transition: border-color 0.25s; color-scheme: dark;
+      font-size: 16px !important;
+    }
+    .input-dark::placeholder { color: var(--ink-faint); }
+    .input-dark:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 0 3px var(--gold-dim); }
+
+    input[type="datetime-local"] { color-scheme: dark; cursor: pointer; }
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+      cursor: pointer;
+      filter: invert(0.8) sepia(35%) saturate(500%) hue-rotate(0deg);
+      opacity: 0.85; padding: 4px 6px; border-radius: 6px;
+      background-color: var(--gold-dim);
+      transition: all 0.2s ease;
+    }
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover { opacity: 1; background-color: var(--gold-border); }
+
+    .fade-in { animation: fadeIn 0.5s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .winner-card { animation: winnerPop 0.5s ease-out; }
+    @keyframes winnerPop { 0% { transform: scale(0.5); opacity: 0; } 70% { transform: scale(1.05); } 100% { transform: scale(1); opacity: 1; } }
+    .correct-row { background: rgba(143, 174, 147, 0.08); border-left: 2px solid var(--sage); }
+
+    .eyebrow { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); font-weight: 500; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); }
+    ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+
+    .tab-bar { position: sticky; top: 0; z-index: 30; padding: 0.5rem 0 0.75rem; background: linear-gradient(to bottom, var(--bg-deep) 65%, transparent); }
+    .tab-btn { color: var(--ink-dim); transition: all 0.2s ease; }
+    .tab-btn.active { background: var(--gold); color: var(--bg-deep); }
+
+    .modal-overlay { position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 1rem; }
+
+    .toast-ok { border: 1px solid var(--gold-border); color: var(--gold-light); }
+    .toast-error { border: 1px solid rgba(217, 138, 131, 0.35); color: var(--rose); }
+  </style>
+</head>
+<body>
+
+  <!-- ========== LOGIN SCREEN ========== -->
+  <div id="loginScreen" class="min-h-[100dvh] flex items-center justify-center p-4">
+    <div class="glass gold-border rounded-2xl p-9 w-full max-w-sm fade-in">
+      <div class="text-center mb-8">
+        <h1 class="font-display text-4xl font-semibold gold-text mb-2">๐EP๐</h1>
+        <p class="eyebrow">GVG Reward — Admin Panel</p>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs text-gold-dim mb-1 block">Username</label>
+          <input id="loginUser" type="text" class="input-dark w-full px-4 py-3 rounded-xl text-sm" placeholder="Enter username" autocomplete="off" />
+        </div>
+        <div>
+          <label class="text-xs text-gold-dim mb-1 block">Password</label>
+          <input id="loginPass" type="password" class="input-dark w-full px-4 py-3 rounded-xl text-sm" placeholder="Enter password" onkeydown="if(event.key==='Enter') doLogin()" />
+        </div>
+        <button onclick="doLogin()" id="btnLogin" class="btn-gold w-full py-3 rounded-xl font-medium text-sm mt-2">เข้าสู่ระบบ</button>
+        <p id="loginError" class="text-xs text-center hidden" style="color: var(--rose);">Username หรือ Password ไม่ถูกต้อง</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== ADMIN DASHBOARD ========== -->
+  <div id="adminDashboard" class="hidden min-h-[100dvh] p-4 pb-8">
+    <div class="max-w-lg mx-auto">
+      <div class="text-center mb-6 fade-in">
+        <h1 class="font-display text-3xl font-semibold gold-text">๐EP๐ Admin</h1>
+        <p class="eyebrow mt-1">GVG Reward Management</p>
+      </div>
+
+      <!-- Loading Banner ตอนกำลัง Sync ข้อมูล -->
+      <div id="syncLoadingBanner" class="hidden glass gold-border rounded-xl p-3 mb-4 flex items-center justify-center gap-2.5 text-xs text-gold">
+        <span class="inline-block w-3.5 h-3.5 border-2 border-t-transparent rounded-full animate-spin" style="border-color: var(--gold); border-top-color: transparent;"></span>
+        <span class="font-medium">กำลังซิงค์ข้อมูลกับ Google Sheet กรุณารอสักครู่</span>
+      </div>
+
+      <!-- สถานะ -->
+      <div class="glass-card rounded-xl p-4 mb-4 fade-in">
+        <div class="flex items-center justify-between">
+          <span class="eyebrow">สถานะกิจกรรม</span>
+          <span id="currentStatus" class="text-xs font-medium px-3 py-1 rounded-full glass-card">—</span>
+        </div>
+      </div>
+
+      <!-- แจ้งเตือนเมื่อเลยเวลาสิ้นสุดรับคำตอบแล้ว -->
+      <div id="deadlinePassedBanner" class="hidden glass rounded-xl p-3 mb-4 flex items-center gap-2.5 text-xs fade-in" style="border: 1px solid rgba(217, 138, 131, 0.3); color: var(--rose);">
+        <span class="inline-block w-1.5 h-1.5 rounded-full flex-shrink-0" style="background: var(--rose);"></span>
+        <span class="font-medium">เลยเวลาสิ้นสุดรับคำตอบแล้ว — พร้อมสุ่มรางวัลได้เลย</span>
+      </div>
+
+      <!-- แท็บ -->
+      <div class="tab-bar">
+        <div class="flex gap-1.5 glass-card rounded-xl p-1.5">
+          <button class="tab-btn active flex-1 py-2 rounded-lg text-xs font-medium" data-tab="tabSetup" onclick="switchTab('tabSetup')">ตั้งค่า</button>
+          <button class="tab-btn flex-1 py-2 rounded-lg text-xs font-medium" data-tab="tabDraw" onclick="switchTab('tabDraw')">สุ่มรางวัล</button>
+          <button class="tab-btn flex-1 py-2 rounded-lg text-xs font-medium" data-tab="tabData" onclick="switchTab('tabData')">ข้อมูล</button>
+        </div>
+      </div>
+
+      <!-- ========== TAB: ตั้งค่า ========== -->
+      <div id="tabSetup">
+      <!-- ฟอร์มตั้งค่า -->
+      <div class="glass-card gold-border rounded-2xl p-5 mb-4 fade-in">
+        <p class="eyebrow mb-4">ตั้งค่ากิจกรรม</p>
+        <div class="space-y-3">
+          <div>
+            <label class="text-xs text-gold-dim mb-1 block">คำถาม</label>
+            <textarea id="cfgQuestion" rows="2" class="input-dark w-full px-4 py-2.5 rounded-xl text-sm resize-none" placeholder="พิมพ์คำถามที่นี่..."></textarea>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="text-xs text-gold-dim mb-1 block">ก.</label><input id="cfgOptA" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm" placeholder="ตัวเลือก ก" /></div>
+            <div><label class="text-xs text-gold-dim mb-1 block">ข.</label><input id="cfgOptB" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm" placeholder="ตัวเลือก ข" /></div>
+            <div><label class="text-xs text-gold-dim mb-1 block">ค.</label><input id="cfgOptC" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm" placeholder="ตัวเลือก ค" /></div>
+            <div><label class="text-xs text-gold-dim mb-1 block">ง.</label><input id="cfgOptD" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm" placeholder="ตัวเลือก ง" /></div>
+          </div>
+          <div>
+            <label class="text-xs text-gold-dim mb-1 block">คำตอบที่ถูกต้อง</label>
+            <select id="cfgCorrect" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm">
+              <option value="A">ก.</option><option value="B">ข.</option><option value="C">ค.</option><option value="D">ง.</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-gold-dim mb-1 block">จำนวนรางวัล (คน)</label>
+            <input id="cfgPrize" type="number" min="1" max="60" value="1" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm" />
+          </div>
+          <div>
+            <label class="text-xs text-gold-dim mb-1 flex items-center justify-between">
+              <span>เวลาสิ้นสุดรับคำตอบ</span>
+              <span class="text-[11px] text-gold">คลิกเลือกวัน/เวลา</span>
+            </label>
+            <input id="cfgEndTime" type="datetime-local" onclick="try{this.showPicker()}catch(e){}" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm" />
+          </div>
+          <button onclick="doSaveConfig()" id="btnSave" class="btn-gold w-full py-3 rounded-xl font-medium text-sm mt-2">บันทึก &amp; เปิดกิจกรรม</button>
+        </div>
+      </div>
+
+      <!-- Reset -->
+      <div class="text-center fade-in mb-4">
+        <button onclick="doReset()" class="btn-danger px-6 py-2.5 rounded-xl font-medium text-xs">รีเซ็ตกิจกรรม</button>
+      </div>
+      </div>
+      <!-- ========== /TAB: ตั้งค่า ========== -->
+
+      <!-- ========== TAB: สุ่มรางวัล ========== -->
+      <div id="tabDraw" class="hidden">
+      <!-- สุ่มรางวัล (แบบทีละคน) -->
+      <div class="glass-card gold-border rounded-2xl p-5 mb-4 fade-in">
+        <div class="flex items-center justify-between mb-4">
+          <p class="eyebrow">สุ่มรางวัล (ทีละคน)</p>
+          <span id="drawProgressBadge" class="text-xs px-2.5 py-0.5 rounded-full glass-card text-gold">0 / 0 รางวัล</span>
+        </div>
+
+        <div class="space-y-3">
+          <button onclick="doFetchCorrect()" id="btnFetch" class="btn-outline w-full py-2.5 rounded-xl font-medium text-sm">ดึงรายชื่อคนตอบถูก</button>
+
+          <!-- รายชื่อคนตอบถูก -->
+          <div id="correctListContainer" class="hidden">
+            <div class="flex items-center justify-between mb-2">
+              <span class="eyebrow">คนตอบถูกทั้งหมด</span>
+              <span id="correctCount" class="text-xs font-medium" style="color: var(--sage);">0 คน</span>
+            </div>
+            <div id="correctList" class="max-h-40 overflow-y-auto space-y-1 mb-3"></div>
+          </div>
+
+          <!-- Slot Animation Box ตอนกดสุ่ม -->
+          <div id="adminSlotBox" class="hidden glass gold-border rounded-xl p-4 text-center">
+            <p class="eyebrow mb-1">กำลังสุ่มผู้โชคดี</p>
+            <div id="adminSlotDisplay" class="text-xl font-semibold gold-text py-2">—</div>
+          </div>
+
+          <!-- ปุ่มสุ่มทีละคน (Primary) -->
+          <button onclick="doDrawNextWinner()" id="btnDrawNext" class="btn-gold w-full py-3.5 rounded-xl font-semibold text-sm">สุ่มผู้โชคดีคนที่ 1</button>
+
+          <!-- ปุ่มย่อย: สุ่มที่เหลือทั้งหมด / ล้างเฉพาะผู้ชนะ -->
+          <div class="flex gap-2 pt-1">
+            <button onclick="doDrawAllRemaining()" id="btnDrawAll" class="btn-outline flex-1 py-2 rounded-xl font-medium text-xs">สุ่มที่เหลือทั้งหมด</button>
+            <button onclick="doResetWinners()" id="btnResetWinners" class="btn-outline flex-1 py-2 rounded-xl font-medium text-xs">ล้างผลสุ่มใหม่</button>
+          </div>
+
+          <!-- รายชื่อผู้ชนะสะสม -->
+          <div id="drawResultContainer" class="hidden pt-2">
+            <div class="flex items-center justify-between mb-2">
+              <span class="eyebrow">รายชื่อผู้ได้รับรางวัล</span>
+              <span id="winnersCountBadge" class="text-xs font-medium text-gold">0 คน</span>
+            </div>
+            <div id="drawResult" class="space-y-2 max-h-60 overflow-y-auto"></div>
+          </div>
+        </div>
+      </div>
+      </div>
+      <!-- ========== /TAB: สุ่มรางวัล ========== -->
+
+      <!-- ========== TAB: ข้อมูล ========== -->
+      <div id="tabData" class="hidden">
+      <!-- ดูคนตอบทั้งหมด -->
+      <div class="glass-card rounded-xl p-5 mb-4 fade-in">
+        <p class="eyebrow mb-4">ดูคนตอบทั้งหมด</p>
+        <button onclick="doFetchAll()" class="btn-outline w-full py-2.5 rounded-xl font-medium text-sm">โหลดรายชื่อทั้งหมด</button>
+        <div id="allListContainer" class="hidden mt-3">
+          <div class="flex items-center justify-between mb-2">
+            <span class="eyebrow">ผู้ตอบทั้งหมด</span>
+            <span id="allCount" class="text-xs font-medium text-gold">0 คน</span>
+          </div>
+          <div id="allList" class="max-h-64 overflow-y-auto space-y-1"></div>
+        </div>
+      </div>
+      </div>
+      <!-- ========== /TAB: ข้อมูล ========== -->
+
+      <!-- Toast -->
+      <div id="toast" class="fixed left-1/2 -translate-x-1/2 z-50 hidden" style="bottom: calc(1.5rem + env(safe-area-inset-bottom));">
+        <div class="glass rounded-xl px-5 py-3 text-sm font-medium text-center max-w-xs"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div id="confirmModal" class="hidden modal-overlay">
+    <div class="glass gold-border rounded-2xl p-7 max-w-xs w-full text-center fade-in">
+      <div class="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-4" style="background: rgba(217, 138, 131, 0.14);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d98a83" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+      </div>
+      <p id="confirmModalMsg" class="text-sm text-slate-200 mb-6 leading-relaxed"></p>
+      <div class="flex gap-3">
+        <button id="confirmModalCancel" class="btn-outline flex-1 py-2.5 rounded-xl font-medium text-sm">ยกเลิก</button>
+        <button id="confirmModalOk" class="btn-danger flex-1 py-2.5 rounded-xl font-medium text-sm">ยืนยัน</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    // CONFIG — ใส่ URL ของ GAS Web App ที่ Deploy แล้ว
+    // ============================================================
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxneVh6djgC61gb9rjJXKxXaj7mKOD4U72qlJpoekwHjBeLqaXm64OVXiwpYHUlgzmIig/exec';
+
+    // ============================================================
+    // API Helper — เรียก GAS ผ่าน XHR (รองรับ GAS redirect 302)
+    // ============================================================
+    function gasCall(action, payload) {
+      return new Promise(function(resolve, reject) {
+        var url = new URL(GAS_URL);
+        url.searchParams.set('action', action);
+        if (payload !== undefined) {
+          url.searchParams.set('payload', JSON.stringify(payload));
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url.toString());
+        xhr.setRequestHeader('Accept', 'application/json');
+        xhr.timeout = 20000;
+        xhr.ontimeout = function() {
+          reject(new Error('เชื่อมต่อ GAS หมดเวลา — ลองใหม่อีกครั้ง'));
+        };
+        xhr.onload = function() {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              var data = JSON.parse(xhr.responseText);
+              if (data && data.error && !data.success) {
+                reject(new Error(data.message || data.error));
+              } else {
+                resolve(data);
+              }
+            } catch (e) {
+              console.error('GAS response is not JSON:', xhr.responseText.substring(0, 200));
+              reject(new Error('เซิร์ฟเวอร์ส่งข้อมูลผิดรูปแบบ: ' + xhr.responseText.substring(0, 100)));
+            }
+          } else {
+            reject(new Error('HTTP ' + xhr.status));
+          }
+        };
+        xhr.onerror = function() {
+          console.error('XHR error — ลอง: 1) เช็ค GAS_URL  2) Deploy ด้วย "Anyone"  3) ใช้ local server แทนเปิด file://');
+          reject(new Error('เชื่อมต่อ GAS ไม่ได้ — ตรวจสอบการเชื่อมต่ออินเทอร์เน็ตหรือ URL'));
+        };
+        xhr.send();
+      });
+    }
+
+    // ============================================================
+    // Login
+    // ============================================================
+    let adminAuthUser = '';
+    let adminAuthPass = '';
+
+    async function doLogin() {
+      const user = document.getElementById('loginUser').value.trim();
+      const pass = document.getElementById('loginPass').value.trim();
+      if (!user || !pass) return;
+
+      const btn = document.getElementById('btnLogin');
+      btn.disabled = true; btn.textContent = 'กำลังเข้าสู่ระบบ...';
+
+      try {
+        const res = await gasCall('checkLogin', { user, pass });
+        if (res && res.ok) {
+          adminAuthUser = user;
+          adminAuthPass = pass;
+          document.getElementById('loginScreen').classList.add('hidden');
+          document.getElementById('adminDashboard').classList.remove('hidden');
+          switchTab('tabSetup');
+          startDeadlineWatcher();
+          loadCurrentConfig();
+        } else {
+          document.getElementById('loginError').classList.remove('hidden');
+        }
+      } catch (err) {
+        showToast('เชื่อมต่อไม่ได้: ' + (err.message || err), true);
+      } finally {
+        btn.disabled = false; btn.textContent = 'เข้าสู่ระบบ';
+      }
+    }
+
+    // ============================================================
+    // แท็บ
+    // ============================================================
+    function switchTab(tabId) {
+      ['tabSetup', 'tabDraw', 'tabData'].forEach(function(id) {
+        document.getElementById(id).classList.toggle('hidden', id !== tabId);
+      });
+      document.querySelectorAll('.tab-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.dataset.tab === tabId);
+      });
+    }
+
+    // ============================================================
+    // Confirm Modal (แทน confirm() ของเบราว์เซอร์)
+    // ============================================================
+    function showConfirm(message) {
+      return new Promise(function(resolve) {
+        const modal = document.getElementById('confirmModal');
+        document.getElementById('confirmModalMsg').textContent = message;
+        const btnOk = document.getElementById('confirmModalOk');
+        const btnCancel = document.getElementById('confirmModalCancel');
+
+        function cleanup(result) {
+          modal.classList.add('hidden');
+          btnOk.removeEventListener('click', onOk);
+          btnCancel.removeEventListener('click', onCancel);
+          resolve(result);
+        }
+        function onOk() { cleanup(true); }
+        function onCancel() { cleanup(false); }
+
+        btnOk.addEventListener('click', onOk);
+        btnCancel.addEventListener('click', onCancel);
+        modal.classList.remove('hidden');
+      });
+    }
+
+    // ============================================================
+    // State จัดการหน้าแอดมิน
+    // ============================================================
+    let adminWinners = [];
+    let adminPrizeCount = 1;
+    let adminCorrectList = [];
+
+    // ============================================================
+    // ควบคุม Loading / Sync State ของฟอร์ม
+    // ============================================================
+    function setFormLoading(isLoading) {
+      const banner = document.getElementById('syncLoadingBanner');
+      if (isLoading) {
+        banner.classList.remove('hidden');
+        updateStatusBadge('Loading');
+      } else {
+        banner.classList.add('hidden');
+      }
+
+      const formElements = [
+        'cfgQuestion', 'cfgOptA', 'cfgOptB', 'cfgOptC', 'cfgOptD',
+        'cfgCorrect', 'cfgPrize', 'cfgEndTime', 'btnSave',
+        'btnFetch', 'btnDrawNext', 'btnDrawAll', 'btnResetWinners'
+      ];
+      formElements.forEach(function(id) {
+        const el = document.getElementById(id);
+        if (el) {
+          el.disabled = isLoading;
+          if (isLoading) {
+            el.classList.add('opacity-60', 'cursor-wait');
+          } else {
+            el.classList.remove('opacity-60', 'cursor-wait');
+          }
+        }
+      });
+    }
+
+    // ============================================================
+    // สถานะ Badge
+    // ============================================================
+    function updateStatusBadge(status) {
+      adminActivityStatus = status;
+      const el = document.getElementById('currentStatus');
+      const map = {
+        Loading: { text: 'กำลังซิงค์...', color: 'var(--gold)' },
+        Open:    { text: 'เปิดรับคำตอบ', color: 'var(--sage)' },
+        Drawing: { text: 'กำลังสุ่มรางวัล', color: 'var(--gold)' },
+        Drawn:   { text: 'สุ่มรางวัลเสร็จแล้ว', color: 'var(--gold-light)' }
+      };
+      const info = map[status] || { text: 'ยังไม่มีกิจกรรม', color: 'var(--ink-faint)' };
+      el.innerHTML = '<span class="inline-block w-1.5 h-1.5 rounded-full mr-1.5" style="background:' + info.color + '"></span>' + info.text;
+      updateDeadlineBanner();
+    }
+
+    // ============================================================
+    // แจ้งเตือนเมื่อเลยเวลาสิ้นสุดรับคำตอบแล้ว (Open ค้างไว้เฉยๆ)
+    // ============================================================
+    let adminEndTime = null;
+    let adminActivityStatus = 'NoData';
+    let deadlineCheckTimer = null;
+
+    function updateDeadlineBanner() {
+      const banner = document.getElementById('deadlinePassedBanner');
+      if (!banner) return;
+      const passed = adminActivityStatus === 'Open' && adminEndTime && Date.now() > new Date(adminEndTime).getTime();
+      banner.classList.toggle('hidden', !passed);
+    }
+
+    function startDeadlineWatcher() {
+      if (deadlineCheckTimer) clearInterval(deadlineCheckTimer);
+      deadlineCheckTimer = setInterval(updateDeadlineBanner, 15000);
+      updateDeadlineBanner();
+    }
+
+    // ============================================================
+    // โหลด Config ปัจจุบัน + สถานะการสุ่ม (พร้อม Loading Screen)
+    // ============================================================
+    async function loadCurrentConfig() {
+      setFormLoading(true);
+      try {
+        const [cfg, statusData] = await Promise.all([
+          gasCall('getAdminConfig', { user: adminAuthUser, pass: adminAuthPass }),
+          gasCall('getStatus').catch(function() { return null; })
+        ]);
+
+        if (!cfg || cfg.status === 'NoData') {
+          adminEndTime = null;
+          updateStatusBadge('NoData');
+          clearFormInputs();
+          adminWinners = [];
+          adminPrizeCount = 1;
+          adminCorrectList = [];
+          renderWinnersList();
+          return;
+        }
+
+        adminEndTime = cfg.endTime || null;
+        updateStatusBadge(cfg.status);
+        adminPrizeCount = parseInt(cfg.prizeCount) || 1;
+
+        // เติมข้อมูลลงฟอร์ม
+        document.getElementById('cfgQuestion').value = cfg.question || '';
+        document.getElementById('cfgOptA').value = cfg.optionA || '';
+        document.getElementById('cfgOptB').value = cfg.optionB || '';
+        document.getElementById('cfgOptC').value = cfg.optionC || '';
+        document.getElementById('cfgOptD').value = cfg.optionD || '';
+        document.getElementById('cfgCorrect').value = cfg.correctAnswer || 'A';
+        document.getElementById('cfgPrize').value = adminPrizeCount;
+
+        if (cfg.endTime) {
+          try {
+            const d = new Date(cfg.endTime);
+            document.getElementById('cfgEndTime').value = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+          } catch (e) {
+            document.getElementById('cfgEndTime').value = cfg.endTime;
+          }
+        } else {
+          document.getElementById('cfgEndTime').value = '';
+        }
+
+        if (statusData) {
+          adminWinners = Array.isArray(statusData.winners) ? statusData.winners : [];
+          adminPrizeCount = parseInt(statusData.prizeCount) || adminPrizeCount;
+          if (Array.isArray(statusData.correctRespondents)) {
+            adminCorrectList = statusData.correctRespondents;
+          }
+          renderWinnersList();
+        }
+      } catch (err) {
+        showToast('ซิงค์ข้อมูลไม่สำเร็จ: ' + (err.message || err), true);
+        updateStatusBadge('NoData');
+      } finally {
+        setFormLoading(false);
+        updateDrawControls();
+      }
+    }
+
+    function clearFormInputs() {
+      document.getElementById('cfgQuestion').value = '';
+      document.getElementById('cfgOptA').value = '';
+      document.getElementById('cfgOptB').value = '';
+      document.getElementById('cfgOptC').value = '';
+      document.getElementById('cfgOptD').value = '';
+      document.getElementById('cfgCorrect').value = 'A';
+      document.getElementById('cfgPrize').value = 1;
+      document.getElementById('cfgEndTime').value = '';
+    }
+
+    // ============================================================
+    // บันทึกตั้งค่า & เปิดกิจกรรมรอบใหม่
+    // ============================================================
+    let isSavingConfig = false;
+
+    async function doSaveConfig() {
+      if (isSavingConfig) return;
+
+      const q = document.getElementById('cfgQuestion').value.trim();
+      if (!q) { showToast('กรุณากรอกคำถาม', true); return; }
+
+      const prizeCountVal = parseInt(document.getElementById('cfgPrize').value) || 1;
+
+      const endTimeRaw = document.getElementById('cfgEndTime').value;
+      if (!endTimeRaw) { showToast('กรุณาตั้งเวลาสิ้นสุด', true); return; }
+
+      // แปลงเป็น UTC ISO string ที่ชัดเจนก่อนส่ง — ป้องกัน Google Sheets ตีความ timezone
+      // ของ string เปล่าๆ (ไม่มี zone info) ผิดไปจาก timezone ที่แอดมินตั้งใจเลือกจริง
+      const endTimeISO = new Date(endTimeRaw).toISOString();
+
+      const data = {
+        question:      q,
+        optionA:       document.getElementById('cfgOptA').value.trim(),
+        optionB:       document.getElementById('cfgOptB').value.trim(),
+        optionC:       document.getElementById('cfgOptC').value.trim(),
+        optionD:       document.getElementById('cfgOptD').value.trim(),
+        correctAnswer: document.getElementById('cfgCorrect').value,
+        prizeCount:    prizeCountVal,
+        endTime:       endTimeISO
+      };
+      if (!data.optionA || !data.optionB) { showToast('กรุณากรอกตัวเลือกอย่างน้อย 2 ข้อ', true); return; }
+
+      isSavingConfig = true;
+      const btn = document.getElementById('btnSave');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="inline-block w-3.5 h-3.5 border-2 border-t-transparent rounded-full animate-spin align-[-2px] mr-2" style="border-color: var(--bg-deep); border-top-color: transparent;"></span>กำลังบันทึก...';
+
+      try {
+        const res = await gasCall('saveConfig', data);
+        if (res && res.success) {
+          showToast(res.message || 'บันทึกสำเร็จ — กิจกรรมเปิดแล้ว');
+          adminEndTime = endTimeISO;
+          updateStatusBadge('Open');
+
+          // รีเซ็ตสถานะการสุ่มสำหรับรอบใหม่ทันที
+          adminWinners = [];
+          adminPrizeCount = prizeCountVal;
+          adminCorrectList = [];
+          renderWinnersList();
+
+          document.getElementById('correctListContainer').classList.add('hidden');
+          document.getElementById('drawResultContainer').classList.add('hidden');
+          document.getElementById('allListContainer').classList.add('hidden');
+        } else {
+          showToast((res && (res.message || res.error)) || 'เกิดข้อผิดพลาดในการบันทึก', true);
+        }
+      } catch (err) {
+        showToast(err.message || err, true);
+      } finally {
+        isSavingConfig = false;
+        btn.disabled = false; btn.textContent = 'บันทึก & เปิดกิจกรรม';
+      }
+    }
+
+    // ============================================================
+    // ดึงรายชื่อคนตอบถูก
+    // ============================================================
+    async function doFetchCorrect() {
+      const btn = document.getElementById('btnFetch');
+      btn.disabled = true; btn.textContent = 'กำลังโหลด...';
+
+      try {
+        const list = await gasCall('getCorrect', { user: adminAuthUser, pass: adminAuthPass });
+        const container = document.getElementById('correctListContainer');
+        const listEl = document.getElementById('correctList');
+        const countEl = document.getElementById('correctCount');
+
+        container.classList.remove('hidden');
+        const safeList = Array.isArray(list) ? list : [];
+        adminCorrectList = safeList.map(function(item) { return item.ign; });
+        countEl.textContent = safeList.length + ' คน';
+        listEl.innerHTML = '';
+
+        if (safeList.length === 0) {
+          listEl.innerHTML = '<p class="text-xs text-gold-dim text-center py-3">ยังไม่มีคนตอบถูก</p>';
+        } else {
+          safeList.forEach(function(item, i) {
+            const div = document.createElement('div');
+            div.className = 'correct-row rounded-lg px-3 py-2 flex items-center justify-between';
+            div.innerHTML = '<span class="text-sm font-medium" style="color:var(--sage)">' + (i + 1) + '. ' + escHtml(item.ign) + '</span>' +
+              '<span class="text-xs text-gold-dim">' + escHtml(String(item.timestamp)) + '</span>';
+            listEl.appendChild(div);
+          });
+        }
+      } catch (err) {
+        showToast(err.message || err, true);
+      } finally {
+        btn.disabled = false; btn.textContent = 'ดึงรายชื่อคนตอบถูก';
+      }
+    }
+
+    function updateDrawControls() {
+      const drawnCount = adminWinners.length;
+      const total = adminPrizeCount;
+      const isComplete = drawnCount >= total && total > 0;
+
+      document.getElementById('drawProgressBadge').textContent = drawnCount + ' / ' + total + ' รางวัล';
+      document.getElementById('winnersCountBadge').textContent = drawnCount + ' / ' + total + ' คน';
+
+      const btnNext = document.getElementById('btnDrawNext');
+      const btnAll = document.getElementById('btnDrawAll');
+
+      if (isComplete) {
+        btnNext.disabled = true;
+        btnNext.textContent = 'สุ่มครบ ' + total + ' รางวัลแล้ว';
+        btnNext.className = 'w-full py-3.5 rounded-xl font-semibold text-sm cursor-not-allowed glass-card text-gold-dim';
+        btnAll.disabled = true;
+        btnAll.classList.add('opacity-40', 'cursor-not-allowed');
+      } else {
+        btnNext.disabled = false;
+        btnNext.textContent = 'สุ่มผู้โชคดีคนที่ ' + (drawnCount + 1) + ' (จาก ' + total + ' รางวัล)';
+        btnNext.className = 'btn-gold w-full py-3.5 rounded-xl font-semibold text-sm';
+        btnAll.disabled = false;
+        btnAll.classList.remove('opacity-40', 'cursor-not-allowed');
+      }
+    }
+
+    function renderWinnersList() {
+      const container = document.getElementById('drawResultContainer');
+      const listEl = document.getElementById('drawResult');
+      updateDrawControls();
+
+      if (adminWinners.length === 0) {
+        container.classList.add('hidden');
+        listEl.innerHTML = '';
+        return;
+      }
+
+      container.classList.remove('hidden');
+      listEl.innerHTML = '';
+
+      adminWinners.forEach(function(ign, i) {
+        const div = document.createElement('div');
+        div.className = 'winner-card glass gold-border rounded-xl px-4 py-2.5 flex items-center justify-between';
+        div.innerHTML =
+          '<div class="flex items-center gap-2.5">' +
+            '<span class="font-display text-base font-semibold gold-text">#' + (i + 1) + '</span>' +
+            '<span class="text-sm font-medium text-slate-100">' + escHtml(ign) + '</span>' +
+          '</div>' +
+          '<span class="text-xs text-gold px-2 py-0.5 rounded-md" style="background:var(--gold-dim)">รางวัลที่ ' + (i + 1) + '</span>';
+        listEl.appendChild(div);
+      });
+    }
+
+    // ============================================================
+    // สุ่มทีละคน (Step-by-Step)
+    // ============================================================
+    async function doDrawNextWinner() {
+      const btn = document.getElementById('btnDrawNext');
+      btn.disabled = true;
+      btn.textContent = 'กำลังสุ่ม...';
+
+      // ดึงรายชื่อคนตอบถูกล่าสุดก่อนสุ่ม
+      try {
+        if (adminCorrectList.length === 0) {
+          const list = await gasCall('getCorrect', { user: adminAuthUser, pass: adminAuthPass });
+          if (Array.isArray(list)) {
+            adminCorrectList = list.map(function(item) { return item.ign; });
+          }
+        }
+      } catch (_) {}
+
+      // แสดง Slot Animation บนหน้า Admin
+      const slotBox = document.getElementById('adminSlotBox');
+      const slotDisplay = document.getElementById('adminSlotDisplay');
+      slotBox.classList.remove('hidden');
+
+      const names = adminCorrectList.length > 0 ? adminCorrectList : ['...'];
+      let spinInterval = setInterval(function() {
+        slotDisplay.textContent = names[Math.floor(Math.random() * names.length)];
+      }, 70);
+
+      try {
+        const res = await gasCall('drawNextWinner');
+
+        clearInterval(spinInterval);
+
+        if (!res || !res.success) {
+          slotBox.classList.add('hidden');
+          showToast((res && (res.message || res.error)) || 'ไม่สามารถสุ่มได้', true);
+          updateDrawControls();
+          return;
+        }
+
+        // แสดงชื่อผู้ชนะบน Slot Box
+        slotDisplay.textContent = res.winner;
+        showToast(res.message);
+
+        if (Array.isArray(res.winners)) {
+          adminWinners = res.winners;
+        } else if (res.winner) {
+          adminWinners.push(res.winner);
+        }
+
+        renderWinnersList();
+
+        updateStatusBadge(res.isComplete ? 'Drawn' : 'Drawing');
+
+        // ซ่อน slot box หลัง 2.5 วินาที
+        setTimeout(function() {
+          slotBox.classList.add('hidden');
+        }, 2500);
+
+      } catch (err) {
+        clearInterval(spinInterval);
+        slotBox.classList.add('hidden');
+        showToast(err.message || err, true);
+        updateDrawControls();
+      }
+    }
+
+    // ============================================================
+    // สุ่มที่เหลือทั้งหมด
+    // ============================================================
+    async function doDrawAllRemaining() {
+      if (!(await showConfirm('ต้องการสุ่มผู้ชนะที่เหลือทั้งหมดในครั้งเดียวเลยหรือไม่?'))) return;
+
+      const btn = document.getElementById('btnDrawAll');
+      btn.disabled = true; btn.textContent = 'กำลังสุ่ม...';
+
+      try {
+        const res = await gasCall('drawWinners');
+        if (!res || !res.success) {
+          showToast((res && (res.message || res.error)) || 'เกิดข้อผิดพลาดในการสุ่ม', true);
+          return;
+        }
+
+        showToast(res.message || 'สุ่มครบแล้ว');
+        if (Array.isArray(res.winners)) {
+          adminWinners = res.winners;
+        }
+        renderWinnersList();
+        updateStatusBadge('Drawn');
+      } catch (err) {
+        showToast(err.message || err, true);
+      } finally {
+        btn.textContent = 'สุ่มที่เหลือทั้งหมด';
+        updateDrawControls();
+      }
+    }
+
+    // ============================================================
+    // ล้างเฉพาะผู้ชนะ เพื่อเริ่มสุ่มใหม่
+    // ============================================================
+    async function doResetWinners() {
+      if (!(await showConfirm('ต้องการล้างรายชื่อผู้ชนะเพื่อเริ่มสุ่มใหม่ใช่หรือไม่? (คำตอบของลูกกิลด์จะไม่หาย)'))) return;
+
+      try {
+        const res = await gasCall('resetWinners');
+        if (res && res.success) {
+          showToast(res.message || 'ล้างผลสุ่มเรียบร้อย');
+          adminWinners = [];
+          renderWinnersList();
+          updateStatusBadge('Open');
+        } else {
+          showToast((res && (res.message || res.error)) || 'ล้างผลสุ่มไม่สำเร็จ', true);
+        }
+      } catch (err) {
+        showToast(err.message || err, true);
+      }
+    }
+
+    // ============================================================
+    // ดูคนตอบทั้งหมด
+    // ============================================================
+    async function doFetchAll() {
+      try {
+        const list = await gasCall('getAll');
+        const container = document.getElementById('allListContainer');
+        const listEl = document.getElementById('allList');
+        const countEl = document.getElementById('allCount');
+
+        container.classList.remove('hidden');
+        const safeList = Array.isArray(list) ? list : [];
+        countEl.textContent = safeList.length + ' คน';
+        listEl.innerHTML = '';
+
+        if (safeList.length === 0) {
+          listEl.innerHTML = '<p class="text-xs text-gold-dim text-center py-3">ยังไม่มีคนตอบ</p>';
+        } else {
+          safeList.forEach(function(item, i) {
+            const div = document.createElement('div');
+            div.className = 'glass-card rounded-lg px-3 py-2 flex items-center justify-between';
+            div.innerHTML = '<span class="text-sm text-slate-200">' + (i + 1) + '. ' + escHtml(item.ign) + '</span>' +
+              '<span class="text-xs px-2 py-0.5 rounded-full text-gold" style="background:var(--gold-dim)">' + escHtml(item.answer) + '</span>';
+            listEl.appendChild(div);
+          });
+        }
+      } catch (err) {
+        showToast(err.message || err, true);
+      }
+    }
+
+    // ============================================================
+    // Reset กิจกรรมทั้งหมด (เคลียร์ทั้ง Sheet และฟอร์มหน้าจอ)
+    // ============================================================
+    async function doReset() {
+      if (!(await showConfirm('ยืนยันรีเซ็ตกิจกรรมทั้งหมด? (ระบบจะสำรองข้อมูลรอบปัจจุบันเข้า History แล้วล้างคำถาม/คำตอบออก)'))) return;
+      try {
+        const res = await gasCall('reset');
+        showToast((res && res.message) || 'รีเซ็ตกิจกรรมเรียบร้อย');
+        updateStatusBadge('NoData');
+
+        // เคลียร์ค่าในฟอร์มหน้าจอ
+        clearFormInputs();
+
+        // รีเซ็ตตัวแปร State
+        adminWinners = [];
+        adminPrizeCount = 1;
+        adminCorrectList = [];
+        adminEndTime = null;
+        renderWinnersList();
+
+        document.getElementById('correctListContainer').classList.add('hidden');
+        document.getElementById('drawResultContainer').classList.add('hidden');
+        document.getElementById('allListContainer').classList.add('hidden');
+      } catch (err) {
+        showToast(err.message || err, true);
+      }
+    }
+
+    // ============================================================
+    // Utils
+    // ============================================================
+    function showToast(msg, isError) {
+      const toast = document.getElementById('toast');
+      const inner = toast.querySelector('div');
+      inner.textContent = msg;
+      inner.className = 'glass rounded-xl px-5 py-3 text-sm font-medium text-center max-w-xs ' +
+        (isError ? 'toast-error' : 'toast-ok');
+      toast.classList.remove('hidden');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(function() { toast.classList.add('hidden'); }, 3500);
+    }
+
+    function escHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>
