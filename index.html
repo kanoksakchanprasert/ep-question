@@ -9,19 +9,22 @@
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap');
 
     :root {
-      --bg-deep: #0a0d16;
-      --bg-mid: #131a2c;
-      --panel: rgba(19, 24, 41, 0.55);
-      --panel-soft: rgba(19, 24, 41, 0.38);
-      --border-soft: rgba(255, 255, 255, 0.07);
-      --gold: #c9a24d;
-      --gold-light: #e3c785;
-      --gold-dim: rgba(201, 162, 77, 0.16);
-      --gold-border: rgba(201, 162, 77, 0.28);
-      --ink: #eef0f5;
-      --ink-dim: #8b93a7;
-      --ink-faint: #5c6478;
-      --rose: #d98a83;
+      color-scheme: light;
+      --bg-deep: #f7f2e7;
+      --bg-mid: #efe4cf;
+      --panel: rgba(255, 255, 255, 0.62);
+      --panel-soft: rgba(255, 255, 255, 0.46);
+      --border-soft: rgba(43, 36, 27, 0.10);
+      --gold: #b3833c;
+      --gold-light: #d1a052;
+      --gold-dim: rgba(179, 131, 60, 0.16);
+      --gold-border: rgba(179, 131, 60, 0.32);
+      --ink: #2b241b;
+      --ink-dim: #6f6455;
+      --ink-faint: #8f8371;
+      --rose: #b1453c;
+      --gold-text: #8f6427;
+      --on-accent: #2a1c08;
     }
 
     * { font-family: 'Prompt', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -50,17 +53,17 @@
       background: linear-gradient(135deg, var(--gold), var(--gold-light));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
-    .text-gold { color: var(--gold-light); }
+    .text-gold { color: var(--gold-text); }
     .text-gold-dim { color: var(--ink-dim); }
     .gold-border { border: 1px solid var(--gold-border); }
-    .gold-glow { box-shadow: 0 0 28px rgba(201, 162, 77, 0.10); }
+    .gold-glow { box-shadow: 0 0 28px rgba(179, 131, 60, 0.18); }
 
-    .btn-gold { background: var(--gold); color: var(--bg-deep); transition: all 0.25s ease; }
-    .btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 10px 22px rgba(201, 162, 77, 0.16); }
+    .btn-gold { background: var(--gold); color: var(--on-accent); transition: all 0.25s ease; }
+    .btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 10px 22px rgba(179, 131, 60, 0.22); }
     .btn-gold:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
 
     .input-dark {
-      background: rgba(8, 11, 20, 0.55); border: 1px solid var(--border-soft);
+      background: rgba(255, 255, 255, 0.55); border: 1px solid var(--border-soft);
       color: var(--ink); transition: border-color 0.25s;
       font-size: 16px !important;
     }
@@ -73,21 +76,21 @@
     .eyebrow { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); font-weight: 500; }
     .divider-gold { width: 3rem; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin: 0 auto; }
 
-    .toast-ok { border: 1px solid var(--gold-border); color: var(--gold-light); }
-    .toast-error { border: 1px solid rgba(217, 138, 131, 0.35); color: var(--rose); }
+    .toast-ok { border: 1px solid var(--gold-border); color: var(--gold-text); }
+    .toast-error { border: 1px solid rgba(177, 69, 60, 0.35); color: var(--rose); }
 
     /* Radio — touch-friendly */
     .option-radio { display: none; }
     .option-label {
       display: flex; align-items: center; gap: 0.85rem; padding: 1rem 1.15rem;
       border-radius: 0.85rem; cursor: pointer; transition: all 0.2s ease;
-      background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-soft);
+      background: rgba(255, 255, 255, 0.5); border: 1px solid var(--border-soft);
     }
     .option-label:active { transform: scale(0.985); }
     .option-radio:checked + .option-label { border-color: var(--gold); background: var(--gold-dim); }
     .option-dot {
       width: 19px; height: 19px; border-radius: 50%;
-      border: 1.5px solid rgba(255, 255, 255, 0.16);
+      border: 1.5px solid rgba(43, 36, 27, 0.18);
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0; transition: all 0.2s;
     }
@@ -95,29 +98,42 @@
     .option-radio:checked + .option-label .option-dot::after { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--bg-deep); }
     .option-key {
       width: 25px; height: 25px; border-radius: 7px;
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(43, 36, 27, 0.05);
       display: flex; align-items: center; justify-content: center;
       font-size: 12px; font-weight: 600; color: var(--ink-dim); flex-shrink: 0;
     }
-    .option-radio:checked + .option-label .option-key { background: var(--gold-dim); color: var(--gold-light); }
+    .option-radio:checked + .option-label .option-key { background: var(--gold-dim); color: var(--gold-text); }
 
     /* Countdown */
-    .countdown-ring { background: conic-gradient(var(--gold) var(--progress, 100%), rgba(255,255,255,0.05) 0); border-radius: 50%; padding: 3px; }
+    .countdown-ring { background: conic-gradient(var(--gold) var(--progress, 100%), rgba(43,36,27,0.08) 0); border-radius: 50%; padding: 3px; }
     .countdown-inner { background: var(--bg-deep); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
     /* Winner animation */
     .slot-text { transition: none; font-size: 1.5rem; font-weight: 600; }
-    .slot-spinning { animation: slotFlash 0.08s steps(1) infinite; }
-    @keyframes slotFlash { 0% { opacity: 1; } 50% { opacity: 0.55; } 100% { opacity: 1; } }
     .winner-reveal { animation: winReveal 0.7s ease-out; }
     @keyframes winReveal { 0% { transform: scale(0.4); opacity: 0; } 60% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
+
+    /* Prize wheel */
+    .wheel-wrap { position: relative; width: 200px; height: 200px; margin: 0 auto; }
+    /* ขนาด (width/height) ถูกกำหนดเป็น px จาก JS — ที่นี่คุมเฉพาะหน้าตา */
+    .wheel-canvas { display: block; border-radius: 50%; background: var(--bg-deep); box-shadow: inset 0 0 0 4px var(--gold-border), 0 6px 18px rgba(0,0,0,0.16); }
+    .wheel-pointer {
+      position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+      width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent;
+      border-top: 24px solid var(--gold); z-index: 5; filter: drop-shadow(0 2px 2px rgba(0,0,0,.25));
+    }
+    .wheel-hub {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      width: 42px; height: 42px; border-radius: 50%; background: var(--gold);
+      border: 4px solid var(--bg-deep); z-index: 4; box-shadow: 0 2px 6px rgba(0,0,0,.18);
+    }
 
     .confetti-container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; overflow: hidden; z-index: 100; }
     .confetti { position: absolute; width: 8px; height: 8px; border-radius: 1px; animation: confettiFall linear forwards; }
     @keyframes confettiFall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(540deg); opacity: 0; } }
 
     .pulse-warning { animation: pulseWarn 1.6s ease-in-out infinite; }
-    @keyframes pulseWarn { 0%, 100% { box-shadow: 0 0 0 0 rgba(217, 138, 131, 0.28); } 50% { box-shadow: 0 0 0 6px rgba(217, 138, 131, 0); } }
+    @keyframes pulseWarn { 0%, 100% { box-shadow: 0 0 0 0 rgba(177, 69, 60, 0.28); } 50% { box-shadow: 0 0 0 6px rgba(177, 69, 60, 0); } }
 
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -126,7 +142,7 @@
     .submit-bar {
       position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
       padding: 0.85rem 1.1rem calc(0.85rem + env(safe-area-inset-bottom));
-      background: rgba(10, 13, 22, 0.9);
+      background: rgba(247, 242, 231, 0.92);
       backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
       border-top: 1px solid var(--gold-border);
     }
@@ -206,7 +222,7 @@
   <div id="submittedScreen" class="hidden min-h-[100dvh] flex items-center justify-center p-4">
     <div class="glass gold-border rounded-2xl p-10 text-center max-w-sm fade-in">
       <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-5" style="background: var(--gold-dim);">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e3c785" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b3833c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
       <h2 class="font-display text-2xl font-semibold text-slate-100 mb-3">ส่งคำตอบเรียบร้อย</h2>
       <p class="text-sm text-gold-dim mb-1">ชื่อ: <span id="submittedIGN" class="text-slate-100 font-medium"></span></p>
@@ -224,8 +240,8 @@
   <!-- TIME UP -->
   <div id="timeUpScreen" class="hidden min-h-[100dvh] flex items-center justify-center p-4">
     <div class="glass gold-border rounded-2xl p-10 text-center max-w-sm fade-in">
-      <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-5" style="background: rgba(217, 138, 131, 0.14);">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d98a83" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+      <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-5" style="background: rgba(177, 69, 60, 0.14);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b1453c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
       </div>
       <h2 class="font-display text-2xl font-semibold text-slate-100 mb-3">หมดเวลาแล้ว</h2>
       <p class="text-sm text-gold-dim mb-6">ปิดรับคำตอบแล้ว</p>
@@ -236,6 +252,7 @@
         <span class="w-1.5 h-1.5 rounded-full animate-bounce" style="background: var(--gold); animation-delay:0.15s"></span>
         <span class="w-1.5 h-1.5 rounded-full animate-bounce" style="background: var(--gold); animation-delay:0.3s"></span>
       </div>
+      <button onclick="location.reload()" class="mt-6 text-xs text-gold-dim underline underline-offset-2">รีเฟรชถ้าค้างนานเกินไป</button>
     </div>
   </div>
 
@@ -249,11 +266,19 @@
       </div>
       <div id="slotArea" class="glass gold-border rounded-2xl p-7 text-center mb-4 fade-in">
         <p class="eyebrow mb-3">กำลังสุ่มรางวัล</p>
-        <div id="slotDisplay" class="slot-text gold-text py-4">—</div>
+        <div class="wheel-wrap mb-4">
+          <div class="wheel-pointer"></div>
+          <div class="wheel-hub"></div>
+          <canvas id="wheelCanvas" class="wheel-canvas"></canvas>
+        </div>
+        <div id="slotDisplay" class="slot-text gold-text py-2">—</div>
       </div>
       <div id="winnersArea" class="hidden space-y-2.5 fade-in">
         <p class="text-center eyebrow mb-2">ผู้โชคดีได้แก่</p>
         <div id="winnersList" class="space-y-2"></div>
+      </div>
+      <div class="text-center mt-6">
+        <button onclick="location.reload()" class="text-xs text-gold-dim underline underline-offset-2">มีกิจกรรมใหม่? กดรีเฟรช</button>
       </div>
     </div>
   </div>
@@ -325,12 +350,33 @@
     let isTimeUp        = false;
     const LABELS = { A: 'ก', B: 'ข', C: 'ค', D: 'ง' };
     const IGN_STORAGE_KEY = 'ep_gvg_last_ign';
+    const SUBMITTED_ROUND_KEY = 'ep_gvg_submitted_round';
 
     function loadSavedIGN() {
       try { return localStorage.getItem(IGN_STORAGE_KEY) || ''; } catch (e) { return ''; }
     }
     function saveIGN(ign) {
       try { localStorage.setItem(IGN_STORAGE_KEY, ign); } catch (e) {}
+    }
+
+    // เก็บ "ลายนิ้วมือของรอบ" (คำถาม+เวลาสิ้นสุด) ไว้กับเครื่องนี้ กันคนพิมพ์ชื่อคนละชื่อ
+    // ส่งซ้ำจากอุปกรณ์เดิม — ไม่ใช่การกันโกงที่สมบูรณ์ (เปลี่ยนเครื่อง/ล้าง storage ก็หลบได้)
+    // แต่ช่วยกันการเนียนตอบซ้ำแบบสุ่มพิมพ์ชื่อใหม่บนมือถือเครื่องเดียวกันได้
+    function roundFingerprint(cfg) {
+      return (cfg && cfg.question || '') + '|' + (cfg && cfg.endTime || '');
+    }
+    function getSubmittedRoundRecord() {
+      try {
+        var raw = localStorage.getItem(SUBMITTED_ROUND_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) { return null; }
+    }
+    function markRoundSubmitted(cfg, ign, answer) {
+      try {
+        localStorage.setItem(SUBMITTED_ROUND_KEY, JSON.stringify({
+          fingerprint: roundFingerprint(cfg), ign: ign, answer: answer
+        }));
+      } catch (e) {}
     }
 
     // ============================================================
@@ -384,6 +430,18 @@
           if (cfg.status === 'Drawing') {
             startPolling();
           }
+          return;
+        }
+
+        const submittedRecord = getSubmittedRoundRecord();
+        if (submittedRecord && submittedRecord.fingerprint === roundFingerprint(cfg)) {
+          // อุปกรณ์นี้ส่งคำตอบรอบนี้ไปแล้ว — กันเนียนพิมพ์ชื่อใหม่ส่งซ้ำจากเครื่องเดิม
+          hasSubmitted = true;
+          document.getElementById('submittedIGN').textContent = submittedRecord.ign;
+          document.getElementById('submittedAns').textContent = LABELS[submittedRecord.answer] + '. ' +
+            (cfg['option' + submittedRecord.answer] || submittedRecord.answer);
+          show('submittedScreen');
+          startPolling();
           return;
         }
 
@@ -465,6 +523,9 @@
         if (diff < 30000) {
           document.getElementById('countdownRing').classList.add('pulse-warning');
           document.getElementById('countdownText').style.color = 'var(--rose)';
+        } else {
+          document.getElementById('countdownRing').classList.remove('pulse-warning');
+          document.getElementById('countdownText').style.color = '';
         }
       }
       tick();
@@ -473,8 +534,22 @@
     function pad(n) { return n < 10 ? '0' + n : String(n); }
 
     // ============================================================
-    // Submit
+    // Submit — ลองใหม่อัตโนมัติถ้าเจอ "ระบบมีคนใช้งานพร้อมกันเยอะ" (lock ชั่วคราวตอนคนแห่ส่งพร้อมกัน)
     // ============================================================
+    async function submitAnswerWithRetry(payload, attemptsLeft) {
+      attemptsLeft = (attemptsLeft === undefined) ? 2 : attemptsLeft;
+      try {
+        return await gasCall('submitAnswer', payload);
+      } catch (err) {
+        const isBusy = /ใช้งานพร้อมกันเยอะ/.test((err && err.message) || '');
+        if (isBusy && attemptsLeft > 0) {
+          await new Promise(function(r) { setTimeout(r, 1500); });
+          return submitAnswerWithRetry(payload, attemptsLeft - 1);
+        }
+        throw err;
+      }
+    }
+
     async function doSubmit() {
       if (hasSubmitted) return;
       if (isTimeUp) { showToast('หมดเวลาแล้ว ไม่สามารถส่งได้', true); return; }
@@ -490,10 +565,11 @@
       btn.disabled = true; btn.textContent = 'กำลังส่ง...';
 
       try {
-        const res = await gasCall('submitAnswer', { ign, answer });
+        const res = await submitAnswerWithRetry({ ign, answer });
         if (res && res.success) {
           hasSubmitted = true;
           saveIGN(ign);
+          markRoundSubmitted(currentConfig, ign, answer);
           clearInterval(countdownTimer);
           document.getElementById('submittedIGN').textContent = ign;
           document.getElementById('submittedAns').textContent = LABELS[answer] + '. ' +
@@ -515,6 +591,145 @@
     // ============================================================
     let revealedWinners = [];
     let isSpinningSlot = false;
+    let wheelCtrl = null;
+
+    // ============================================================
+    // Prize Wheel — วาดวงล้อด้วย canvas แล้วหมุนด้วย rAF จนหยุดตรงผู้ชนะ
+    // ที่ server สุ่มมาแล้ว (วงล้อนี้เป็นแค่ภาพเอฟเฟกต์ ไม่ได้เป็นตัวสุ่มจริง)
+    // ============================================================
+    function normNameCompare(s) { return String(s || '').trim().toUpperCase(); }
+
+    // กำหนดขนาดกรอบวงล้อ (px ตรงๆ) จากความกว้าง "เนื้อที่จริง" ของการ์ดที่ครอบอยู่
+    // (หัก padding ของการ์ดออกด้วย เพราะ clientWidth รวม padding มาด้วย ถ้าไม่หักจะคำนวณ
+    // พื้นที่ว่างเกินจริงแล้ววงล้อยังล้นกรอบได้) แทนที่จะพึ่ง aspect-ratio + percentage-height
+    // ซึ่งบางเบราว์เซอร์/มือถือ resolve ไม่ตรงกัน
+    function getContentWidth(el) {
+      const cs = window.getComputedStyle(el);
+      const padL = parseFloat(cs.paddingLeft) || 0;
+      const padR = parseFloat(cs.paddingRight) || 0;
+      return Math.max(0, el.clientWidth - padL - padR);
+    }
+
+    function sizeWheelWrap(wrap, maxPx, ratio) {
+      const container = wrap.parentElement;
+      const containerWidth = container ? getContentWidth(container) : (wrap.clientWidth || maxPx);
+      const size = Math.max(120, Math.min(maxPx, Math.floor(containerWidth * ratio)));
+      wrap.style.width = size + 'px';
+      wrap.style.height = size + 'px';
+      return size;
+    }
+
+    // สำคัญ: ต้องเซ็ต style.width/height (ขนาดที่แสดงผลจริง) เป็น px ด้วยเสมอ
+    // ไม่งั้น canvas จะแสดงผลตาม attribute width/height ที่คูณ DPR ไว้ (มือถือ 2-3 เท่า) แล้วล้นกรอบ
+    function initWheelCanvas(canvas, size) {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.style.width = size + 'px';
+      canvas.style.height = size + 'px';
+      canvas.width = Math.round(size * dpr);
+      canvas.height = Math.round(size * dpr);
+      canvas.dataset.logicalSize = size;
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function drawWheelSegments(canvas, names) {
+      const ctx = canvas.getContext('2d');
+      const size = parseFloat(canvas.dataset.logicalSize) || canvas.width;
+      const cx = size / 2, cy = size / 2, radius = size / 2 - 3;
+      const n = Math.max(names.length, 1);
+      const anglePer = (2 * Math.PI) / n;
+      const colorA = 'rgba(179, 131, 60, 0.88)';
+      const colorB = 'rgba(19, 24, 41, 0.92)';
+
+      ctx.clearRect(0, 0, size, size);
+      for (let i = 0; i < n; i++) {
+        const start = -Math.PI / 2 + i * anglePer;
+        const end = start + anglePer;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, radius, start, end);
+        ctx.closePath();
+        ctx.fillStyle = (i % 2 === 0) ? colorA : colorB;
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        if (anglePer > 0.16 && names[i]) {
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.rotate(start + anglePer / 2);
+          ctx.textAlign = 'right';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = (i % 2 === 0) ? '#0a0d16' : '#e3c785';
+          ctx.font = '600 13px Prompt, sans-serif';
+          const raw = String(names[i]);
+          const label = raw.length > 13 ? raw.slice(0, 12) + '…' : raw;
+          ctx.fillText(label, radius - 8, 0);
+          ctx.restore();
+        }
+      }
+    }
+
+    function createWheelController(canvas) {
+      return {
+        canvas: canvas,
+        rotation: 0,
+        raf: null,
+        spinning: false,
+        startFastSpin: function() {
+          this.spinning = true;
+          const speed = 360 / 650; // deg ต่อ ms
+          let last = performance.now();
+          const self = this;
+          function step(t) {
+            if (!self.spinning) return;
+            const dt = t - last; last = t;
+            self.rotation += speed * dt;
+            self.canvas.style.transform = 'rotate(' + (self.rotation % 360) + 'deg)';
+            self.raf = requestAnimationFrame(step);
+          }
+          this.raf = requestAnimationFrame(step);
+        },
+        stopAndLandOn: function(names, winnerName, durationMs, onDone) {
+          this.spinning = false;
+          if (this.raf) cancelAnimationFrame(this.raf);
+          const n = names.length;
+          if (n === 0) { onDone && onDone(); return; }
+
+          let winnerIndex = names.findIndex(function(nm) { return normNameCompare(nm) === normNameCompare(winnerName); });
+          if (winnerIndex === -1) winnerIndex = Math.floor(Math.random() * n);
+
+          const anglePerDeg = 360 / n;
+          const sliceCenterDeg = winnerIndex * anglePerDeg + anglePerDeg / 2;
+          const jitter = (Math.random() * 2 - 1) * (anglePerDeg * 0.3);
+          const targetWithinSlice = ((sliceCenterDeg + jitter) % 360 + 360) % 360;
+          const currentMod = ((this.rotation % 360) + 360) % 360;
+          let neededMod = (360 - targetWithinSlice) % 360;
+          let delta = neededMod - currentMod;
+          if (delta < 0) delta += 360;
+          const extraSpins = 3;
+          const finalRotation = this.rotation + delta + extraSpins * 360;
+
+          const startRotation = this.rotation;
+          const startTime = performance.now();
+          const self = this;
+          function animate(t) {
+            const elapsed = t - startTime;
+            const progress = Math.min(1, elapsed / durationMs);
+            const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+            self.rotation = startRotation + (finalRotation - startRotation) * eased;
+            self.canvas.style.transform = 'rotate(' + self.rotation + 'deg)';
+            if (progress < 1) {
+              self.raf = requestAnimationFrame(animate);
+            } else {
+              onDone && onDone();
+            }
+          }
+          this.raf = requestAnimationFrame(animate);
+        }
+      };
+    }
 
     // ============================================================
     // Polling — ตรวจสอบการสุ่มทุก 5 วินาที
@@ -525,6 +740,14 @@
         try {
           const data = await gasCall('getStatus');
           if (!data) return;
+
+          // เช็คว่าแอดมินขยายเวลาสิ้นสุดไปมั้ย ถ้าใช่และยังไม่ส่งคำตอบ/ยังไม่หมดเวลา ให้รีสตาร์ท countdown ด้วยเวลาใหม่
+          if (data.status === 'Open' && !hasSubmitted && !isTimeUp &&
+              data.endTime && currentConfig && data.endTime !== currentConfig.endTime) {
+            currentConfig.endTime = data.endTime;
+            clearInterval(countdownTimer);
+            startCountdown(data.endTime);
+          }
 
           const serverWinners = Array.isArray(data.winners) ? data.winners : [];
 
@@ -607,51 +830,54 @@
       const display = document.getElementById('slotDisplay');
       const winnersArea = document.getElementById('winnersArea');
       const winnersList = document.getElementById('winnersList');
+      const wheelCanvas = document.getElementById('wheelCanvas');
 
       slotArea.classList.remove('hidden');
       winnersArea.classList.remove('hidden');
-      display.classList.add('slot-spinning');
+      display.classList.remove('winner-reveal');
+      display.textContent = 'กำลังหมุน...';
 
       const names = allCorrectNames.length > 0 ? allCorrectNames : ['...'];
-      let spinInterval = setInterval(function() {
-        display.textContent = names[Math.floor(Math.random() * names.length)];
-      }, 75);
+      const wheelSize = sizeWheelWrap(wheelCanvas.parentElement, 280, 0.85);
+      initWheelCanvas(wheelCanvas, wheelSize);
+      drawWheelSegments(wheelCanvas, names);
+      if (!wheelCtrl) wheelCtrl = createWheelController(wheelCanvas);
+      wheelCtrl.startFastSpin();
 
       setTimeout(function() {
-        clearInterval(spinInterval);
-        display.classList.remove('slot-spinning');
-        display.textContent = nextWinnerName;
-        display.classList.add('winner-reveal');
+        wheelCtrl.stopAndLandOn(names, nextWinnerName, 2200, function() {
+          display.textContent = nextWinnerName;
+          display.classList.add('winner-reveal');
 
-        // บันทึกว่าแสดงคนนี้แล้ว
-        revealedWinners.push(nextWinnerName);
+          // บันทึกว่าแสดงคนนี้แล้ว
+          revealedWinners.push(nextWinnerName);
 
-        // เพิ่มการ์ดผู้ชนะ
-        const card = document.createElement('div');
-        card.className = 'winner-card glass gold-border rounded-xl p-4 fade-in';
-        card.innerHTML =
-          '<div class="flex items-center justify-between mb-1">' +
-            '<span class="eyebrow">รางวัลที่ ' + rank + '</span>' +
-            '<span class="text-[10px] text-gold-dim">จาก ' + totalPrizes + ' รางวัล</span>' +
-          '</div>' +
-          '<p class="font-display text-xl font-semibold gold-text">' + escHtml(nextWinnerName) + '</p>';
-        winnersList.appendChild(card);
+          // เพิ่มการ์ดผู้ชนะ
+          const card = document.createElement('div');
+          card.className = 'winner-card glass gold-border rounded-xl p-4 fade-in';
+          card.innerHTML =
+            '<div class="flex items-center justify-between mb-1">' +
+              '<span class="eyebrow">รางวัลที่ ' + rank + '</span>' +
+              '<span class="text-[10px] text-gold-dim">จาก ' + totalPrizes + ' รางวัล</span>' +
+            '</div>' +
+            '<p class="font-display text-xl font-semibold gold-text">' + escHtml(nextWinnerName) + '</p>';
+          winnersList.appendChild(card);
 
-        launchConfetti();
+          launchConfetti();
 
-        setTimeout(function() {
-          isSpinningSlot = false;
-          // ถ้ายังมีคนที่ต้อง animate ต่อ
-          if (revealedWinners.length < serverWinners.length) {
-            processNextWinnerAnimation(data);
-          } else if (data.status === 'Drawn' || revealedWinners.length >= totalPrizes) {
-            display.textContent = 'สุ่มครบทุกรางวัลแล้ว';
-          } else {
-            display.textContent = 'รอแอดมินสุ่มรางวัลถัดไป';
-          }
-        }, 1500);
-
-      }, 2500);
+          setTimeout(function() {
+            isSpinningSlot = false;
+            // ถ้ายังมีคนที่ต้อง animate ต่อ
+            if (revealedWinners.length < serverWinners.length) {
+              processNextWinnerAnimation(data);
+            } else if (data.status === 'Drawn' || revealedWinners.length >= totalPrizes) {
+              display.textContent = 'สุ่มครบทุกรางวัลแล้ว';
+            } else {
+              display.textContent = 'รอแอดมินสุ่มรางวัลถัดไป';
+            }
+          }, 1200);
+        });
+      }, 500);
     }
 
     // ============================================================
@@ -661,7 +887,7 @@
       const container = document.getElementById('confettiContainer');
       container.classList.remove('hidden');
       container.innerHTML = '';
-      const colors = ['#c9a24d','#e3c785','#f3e6c3','#ffffff','#9aa3b8'];
+      const colors = ['#b3833c','#d1a052','#8a5a2b','#b1453c','#4c7a52'];
       for (let i = 0; i < 60; i++) {
         const p = document.createElement('div');
         p.className = 'confetti';
