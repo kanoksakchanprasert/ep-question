@@ -119,7 +119,7 @@
        ที่นี่ใส่ width/height สำรองไว้ด้วย เผื่อ canvas โผล่มาให้เห็นก่อน JS จะรันเสร็จ
        (เช่น ตอนโหลดหน้าแรกแล้ว resultScreen ถูกโชว์ระหว่างรอ fetch สถานะ) กัน canvas
        เพี้ยนเป็นวงรีตามขนาด default ของ browser (300x150) ก่อนโดน round เป็นวงกลม */
-    .wheel-canvas { display: block; width: 200px; height: 200px; border-radius: 50%; background: var(--bg-deep); box-shadow: inset 0 0 0 4px var(--gold-border), 0 6px 18px rgba(0,0,0,0.16); }
+    .wheel-canvas { display: block; width: 200px; height: 200px; border-radius: 50%; clip-path: circle(50%); background: var(--bg-deep); box-shadow: inset 0 0 0 4px var(--gold-border), 0 6px 18px rgba(0,0,0,0.16); }
     .wheel-pointer {
       position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
       width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent;
@@ -645,6 +645,15 @@
       const colorB = 'rgba(19, 24, 41, 0.92)';
 
       ctx.clearRect(0, 0, size, size);
+
+      // Safari/WebKit ไม่ clip เนื้อหาที่วาดด้วย canvas ตาม CSS border-radius อย่างน่าเชื่อถือ
+      // (ต่างจาก Chrome/Firefox) — บังคับ clip เป็นวงกลมที่ตัว context เองกันตัวหนังสือ/ขอบ
+      // segment โผล่พ้นวงไปที่มุมสี่เหลี่ยมของ canvas บน iPhone
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.clip();
+
       for (let i = 0; i < n; i++) {
         const start = -Math.PI / 2 + i * anglePer;
         const end = start + anglePer;
@@ -672,6 +681,8 @@
           ctx.restore();
         }
       }
+
+      ctx.restore(); // ปลด clip
     }
 
     function createWheelController(canvas) {
