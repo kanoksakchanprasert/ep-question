@@ -635,6 +635,25 @@
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
+    // วัดความกว้างจริงด้วย ctx.measureText() แทนนับจำนวนตัวอักษร เพราะฟอนต์ไทยกว้าง/แคบ
+    // ต่อตัวอักษรไม่เท่าอังกฤษ — ถ้าตัดคำแค่ตาม .length ชื่อภาษาไทยบางชื่ออาจกว้างเกินจริง
+    // ยื่นทะลุจุดศูนย์กลางไปโดนขอบวงอีกฝั่งแล้วถูก ctx.clip() ตัดออก เหลือเห็นแค่ 1-2 ตัวท้าย
+    function fitLabelToWidth(ctx, text, maxWidth) {
+      if (ctx.measureText(text).width <= maxWidth) return text;
+      let lo = 0, hi = text.length - 1, best = 0;
+      while (lo <= hi) {
+        const mid = (lo + hi) >> 1;
+        const candidate = text.slice(0, mid + 1) + '…';
+        if (ctx.measureText(candidate).width <= maxWidth) {
+          best = mid + 1;
+          lo = mid + 1;
+        } else {
+          hi = mid - 1;
+        }
+      }
+      return best > 0 ? text.slice(0, best) + '…' : '…';
+    }
+
     function drawWheelSegments(canvas, names) {
       const ctx = canvas.getContext('2d');
       const size = parseFloat(canvas.dataset.logicalSize) || canvas.width;
@@ -680,7 +699,8 @@
           ctx.fillStyle = (i % 2 === 0) ? '#0a0d16' : '#e3c785';
           ctx.font = '600 13px Prompt, sans-serif';
           const raw = String(names[i]);
-          const label = raw.length > 13 ? raw.slice(0, 12) + '…' : raw;
+          const maxTextWidth = Math.max(16, (radius - 8) * 0.72);
+          const label = fitLabelToWidth(ctx, raw, maxTextWidth);
           if (needsFlip) {
             ctx.rotate(Math.PI);
             ctx.textAlign = 'left';
