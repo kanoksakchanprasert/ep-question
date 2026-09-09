@@ -514,16 +514,27 @@
         ctx.stroke();
 
         if (anglePer > 0.16 && names[i]) {
+          const midAngle = start + anglePer / 2;
+          // ครึ่งซ้ายของวงล้อ (cos < 0) ถ้าหมุนตามมุมช่องตรงๆ ตัวหนังสือจะหัวกลับ
+          // ต้องหมุนกลับอีก 180° แล้วสลับ textAlign/ตำแหน่ง x เพื่อให้ยังชิดขอบวงเดิม
+          // แต่ตัวอักษรหัวตั้งอ่านออกทั้งสองฝั่ง
+          const needsFlip = Math.cos(midAngle) < 0;
           ctx.save();
           ctx.translate(cx, cy);
-          ctx.rotate(start + anglePer / 2);
-          ctx.textAlign = 'right';
+          ctx.rotate(midAngle);
           ctx.textBaseline = 'middle';
           ctx.fillStyle = (i % 2 === 0) ? '#0a0d16' : '#e3c785';
           ctx.font = '600 12px Prompt, sans-serif';
           const raw = String(names[i]);
           const label = raw.length > 11 ? raw.slice(0, 10) + '…' : raw;
-          ctx.fillText(label, radius - 8, 0);
+          if (needsFlip) {
+            ctx.rotate(Math.PI);
+            ctx.textAlign = 'left';
+            ctx.fillText(label, -(radius - 8), 0);
+          } else {
+            ctx.textAlign = 'right';
+            ctx.fillText(label, radius - 8, 0);
+          }
           ctx.restore();
         }
       }
