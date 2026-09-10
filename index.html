@@ -171,7 +171,7 @@
     <div class="glass gold-border rounded-2xl p-10 text-center max-w-sm fade-in">
       <h1 class="font-display text-4xl font-semibold gold-text mb-4">๐EP๐</h1>
       <div class="divider-gold mb-6"></div>
-      <p id="noActivityTitle" class="text-sm text-slate-200">ยังไม่มีกิจกรรมในตอนนี้</p>
+      <p id="noActivityTitle" class="text-sm">ยังไม่มีกิจกรรมในตอนนี้</p>
       <p id="noActivitySubtitle" class="eyebrow mt-2">กรุณารอแอดมินเปิดกิจกรรม</p>
       <button onclick="location.reload()" class="btn-gold mt-8 px-7 py-2.5 rounded-xl font-medium text-sm">รีเฟรช</button>
     </div>
@@ -203,7 +203,7 @@
       <!-- Question -->
       <div class="glass-card gold-border rounded-2xl p-5 fade-in">
         <p class="eyebrow mb-2">คำถาม</p>
-        <p id="questionText" class="text-[15px] font-medium text-slate-100 leading-relaxed mb-5"></p>
+        <p id="questionText" class="text-[15px] font-medium leading-relaxed mb-5"></p>
         <div id="optionsContainer" class="space-y-2.5"></div>
       </div>
     </div>
@@ -227,8 +227,8 @@
       <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-5" style="background: var(--gold-dim);">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b3833c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
-      <h2 class="font-display text-2xl font-semibold text-slate-100 mb-3">ส่งคำตอบเรียบร้อย</h2>
-      <p class="text-sm text-gold-dim mb-1">ชื่อ: <span id="submittedIGN" class="text-slate-100 font-medium"></span></p>
+      <h2 class="font-display text-2xl font-semibold mb-3">ส่งคำตอบเรียบร้อย</h2>
+      <p class="text-sm text-gold-dim mb-1">ชื่อ: <span id="submittedIGN" class="font-medium"></span></p>
       <p class="text-sm text-gold-dim mb-6">คำตอบ: <span id="submittedAns" class="text-gold font-medium"></span></p>
       <div class="divider-gold mb-5"></div>
       <p class="eyebrow">รอแอดมินสุ่มรางวัล</p>
@@ -246,7 +246,7 @@
       <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-5" style="background: rgba(177, 69, 60, 0.14);">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b1453c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
       </div>
-      <h2 class="font-display text-2xl font-semibold text-slate-100 mb-3">หมดเวลาแล้ว</h2>
+      <h2 class="font-display text-2xl font-semibold mb-3">หมดเวลาแล้ว</h2>
       <p class="text-sm text-gold-dim mb-6">ปิดรับคำตอบแล้ว</p>
       <div class="divider-gold mb-5"></div>
       <p class="eyebrow">รอแอดมินสุ่มรางวัล</p>
@@ -491,7 +491,7 @@
           '<label for="opt' + opt.key + '" class="option-label">' +
             '<span class="option-dot"></span>' +
             '<span class="option-key">' + opt.label + '</span>' +
-            '<span class="text-sm text-slate-200">' + escHtml(opt.text) + '</span>' +
+            '<span class="text-sm">' + escHtml(opt.text) + '</span>' +
           '</label>';
         container.appendChild(wrapper);
       });

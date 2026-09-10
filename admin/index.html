@@ -305,7 +305,7 @@
       <div class="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-4" style="background: rgba(177, 69, 60, 0.14);">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b1453c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
       </div>
-      <p id="confirmModalMsg" class="text-sm text-slate-200 mb-6 leading-relaxed"></p>
+      <p id="confirmModalMsg" class="text-sm mb-6 leading-relaxed"></p>
       <div class="flex gap-3">
         <button id="confirmModalCancel" class="btn-outline flex-1 py-2.5 rounded-xl font-medium text-sm">ยกเลิก</button>
         <button id="confirmModalOk" class="btn-danger flex-1 py-2.5 rounded-xl font-medium text-sm">ยืนยัน</button>
@@ -962,7 +962,7 @@
         div.innerHTML =
           '<div class="flex items-center gap-2.5">' +
             '<span class="font-display text-base font-semibold gold-text">#' + (i + 1) + '</span>' +
-            '<span class="text-sm font-medium text-slate-100">' + escHtml(ign) + '</span>' +
+            '<span class="text-sm font-medium">' + escHtml(ign) + '</span>' +
           '</div>' +
           '<span class="text-xs text-gold px-2 py-0.5 rounded-md" style="background:var(--gold-dim)">รางวัลที่ ' + (i + 1) + '</span>';
         listEl.appendChild(div);
@@ -1121,7 +1121,7 @@
           safeList.forEach(function(item, i) {
             const div = document.createElement('div');
             div.className = 'glass-card rounded-lg px-3 py-2 flex items-center justify-between';
-            div.innerHTML = '<span class="text-sm text-slate-200">' + (i + 1) + '. ' + escHtml(item.ign) + '</span>' +
+            div.innerHTML = '<span class="text-sm">' + (i + 1) + '. ' + escHtml(item.ign) + '</span>' +
               '<span class="text-xs px-2 py-0.5 rounded-full text-gold" style="background:var(--gold-dim)">' + escHtml(item.answer) + '</span>';
             listEl.appendChild(div);
           });
