@@ -296,16 +296,25 @@
 
   <script>
     // ============================================================
-    // CONFIG — ใส่ URL ของ GAS Web App ที่ Deploy แล้ว
+    // CONFIG — URL ของ GAS Web App "โปรเจกต์ CLIENT" ที่ Deploy แล้ว (deploy ซ้ำจาก
+    // gas-client/Code.gs หลายชุด คนละ Web App URL) — สุ่มเลือก 1 ใน N ทุก request
+    // เพื่อกระจาย concurrent-execution quota ของ GAS ออกจากกัน ไม่ให้ตัวใดตัวหนึ่งรับ
+    // โหลดทั้งหมดตอนคนเข้าพร้อมกันเยอะ
     // ============================================================
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxneVh6djgC61gb9rjJXKxXaj7mKOD4U72qlJpoekwHjBeLqaXm64OVXiwpYHUlgzmIig/exec';
+    const GAS_URLS = [
+      'https://script.google.com/macros/s/AKfycbwMiYrEc058Kr_qeQCfMqQyHfUUiTHVfrCtQYWBGFPZXxCoDhkMgoH6XrC76G07jVRA/exec',
+      'https://script.google.com/macros/s/AKfycbyqUA0US9-XRf7tfXvHXq9-QO5cd2509XCDLTdREeIavQmSf60Mb8IprYwcknTLAHPfww/exec'
+    ];
+    function pickGasUrl() {
+      return GAS_URLS[Math.floor(Math.random() * GAS_URLS.length)];
+    }
 
     // ============================================================
     // API Helper — เรียก GAS ผ่าน XHR (รองรับ GAS redirect 302)
     // ============================================================
     function gasCall(action, payload) {
       return new Promise(function(resolve, reject) {
-        var url = new URL(GAS_URL);
+        var url = new URL(pickGasUrl());
         url.searchParams.set('action', action);
         if (payload !== undefined) {
           url.searchParams.set('payload', JSON.stringify(payload));
@@ -336,7 +345,7 @@
           }
         };
         xhr.onerror = function() {
-          console.error('XHR error — ลอง: 1) เช็ค GAS_URL  2) Deploy ด้วย "Anyone"  3) ใช้ local server แทนเปิด file://');
+          console.error('XHR error — ลอง: 1) เช็ค GAS_URLS  2) Deploy ด้วย "Anyone"  3) ใช้ local server แทนเปิด file://');
           reject(new Error('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ — ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต'));
         };
         xhr.send();
