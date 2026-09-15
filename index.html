@@ -108,28 +108,40 @@
     .countdown-ring { background: conic-gradient(var(--gold) var(--progress, 100%), rgba(43,36,27,0.08) 0); border-radius: 50%; padding: 3px; }
     .countdown-inner { background: var(--bg-deep); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
-    /* Winner animation */
-    .slot-text { transition: none; font-size: 1.5rem; font-weight: 600; }
-    .winner-reveal { animation: winReveal 0.7s ease-out; }
-    @keyframes winReveal { 0% { transform: scale(0.4); opacity: 0; } 60% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
-
-    /* Prize wheel */
-    .wheel-wrap { position: relative; width: 200px; height: 200px; margin: 0 auto; }
-    /* width/height ที่แท้จริงถูกกำหนดเป็น px จาก JS (initWheelCanvas) เสมอ
-       ที่นี่ใส่ width/height สำรองไว้ด้วย เผื่อ canvas โผล่มาให้เห็นก่อน JS จะรันเสร็จ
-       (เช่น ตอนโหลดหน้าแรกแล้ว resultScreen ถูกโชว์ระหว่างรอ fetch สถานะ) กัน canvas
-       เพี้ยนเป็นวงรีตามขนาด default ของ browser (300x150) ก่อนโดน round เป็นวงกลม */
-    .wheel-canvas { display: block; width: 200px; height: 200px; border-radius: 50%; clip-path: circle(50%); background: var(--bg-deep); box-shadow: inset 0 0 0 4px var(--gold-border), 0 6px 18px rgba(0,0,0,0.16); }
-    .wheel-pointer {
-      position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
-      width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent;
-      border-top: 24px solid var(--gold); z-index: 5; filter: drop-shadow(0 2px 2px rgba(0,0,0,.25));
+    /* Winner reveal — crowd grid + spotlight chase-light */
+    .person-cell { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .person-icon {
+      width: 52px; height: 52px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--panel-soft); border: 2px solid transparent;
+      transition: box-shadow 90ms ease-out, transform 90ms ease-out, background 180ms ease-out, border-color 180ms ease-out;
     }
-    .wheel-hub {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-      width: 42px; height: 42px; border-radius: 50%; background: var(--gold);
-      border: 4px solid var(--bg-deep); z-index: 4; box-shadow: 0 2px 6px rgba(0,0,0,.18);
+    .person-icon svg { stroke: var(--ink-dim); transition: stroke 180ms ease-out; }
+    .person-icon.is-highlighted {
+      background: var(--gold-dim); border-color: var(--gold); transform: scale(1.12);
+      box-shadow: 0 0 0 4px rgba(179,131,60,0.22), 0 0 26px 8px rgba(179,131,60,0.45);
     }
+    .person-icon.is-highlighted svg { stroke: var(--gold-text); }
+    .person-icon.is-won {
+      background: var(--gold); border-color: var(--gold-light);
+      box-shadow: 0 0 0 3px var(--gold-dim), 0 4px 14px rgba(179,131,60,0.35);
+    }
+    .person-icon.is-won svg { stroke: var(--on-accent); }
+    .person-name {
+      font-size: 11px; line-height: 1.4; text-align: center; color: var(--ink-dim); margin: 0;
+      max-width: 68px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .person-name.is-won-name { color: var(--gold-text); font-weight: 600; }
+    .rank-badge {
+      position: absolute; top: -6px; right: -2px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--rose); color: #fff;
+      font-size: 10px; font-weight: 600;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+    }
+    .won-pop { animation: wonPop 0.6s ease-out; }
+    @keyframes wonPop { 0% { transform: scale(0.7); } 55% { transform: scale(1.16); } 100% { transform: scale(1); } }
 
     .confetti-container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; overflow: hidden; z-index: 100; }
     .confetti { position: absolute; width: 8px; height: 8px; border-radius: 1px; animation: confettiFall linear forwards; }
@@ -267,14 +279,15 @@
         <p class="eyebrow mt-2">ประกาศผลรางวัล GVG</p>
         <div class="divider-gold mt-4"></div>
       </div>
-      <div id="slotArea" class="glass gold-border rounded-2xl p-7 text-center mb-4 fade-in">
-        <p class="eyebrow mb-3">กำลังสุ่มรางวัล</p>
-        <div class="wheel-wrap mb-4">
-          <div class="wheel-pointer"></div>
-          <div class="wheel-hub"></div>
-          <canvas id="wheelCanvas" class="wheel-canvas"></canvas>
+      <div id="slotArea" class="glass-card gold-border rounded-2xl p-4 mb-4 fade-in">
+        <div class="flex items-center justify-between mb-3">
+          <p id="slotDisplay" class="eyebrow">กำลังสุ่มรางวัล</p>
+          <span id="prizeBadge" class="text-[11px] font-semibold rounded-full px-2.5 py-1" style="color: var(--gold-text); background: var(--gold-dim);">0 / 0 รางวัล</span>
         </div>
-        <div id="slotDisplay" class="slot-text gold-text py-2">—</div>
+        <p id="crowdCountText" class="eyebrow mb-2">ผู้ตอบถูกทั้งหมด (0 คน)</p>
+        <div id="crowdScroll" class="max-h-[300px] overflow-y-auto pr-1">
+          <div id="crowdGrid" class="grid grid-cols-4 gap-x-1.5 gap-y-3.5"></div>
+        </div>
       </div>
       <div id="winnersArea" class="hidden space-y-2.5 fade-in">
         <p class="text-center eyebrow mb-2">ผู้โชคดีได้แก่</p>
@@ -311,8 +324,12 @@
 
     // ============================================================
     // API Helper — เรียก GAS ผ่าน XHR (รองรับ GAS redirect 302)
+    // GAS เองบางครั้ง redirect chain สะดุดเฉยๆ (เจอจริง: 404 ชั่วคราวที่หายไปเองพอลองใหม่)
+    // เลย retry อัตโนมัติได้ทุก action ที่นี่ (getConfig/getStatus อ่านอย่างเดียว, submitAnswer
+    // ไม่เช็คซ้ำอยู่แล้วจึงเรียกซ้ำได้อย่างปลอดภัย — ดูเหตุผลเรื่อง dedup ที่ getCorrectRespondents
+    // ฝั่ง admin แทน) — สุ่ม URL ใหม่ทุกครั้งที่ retry ด้วย เผื่อ backend ตัวที่โดนสุ่มไปตัวแรกยังค้าง
     // ============================================================
-    function gasCall(action, payload) {
+    function gasCallOnce(action, payload) {
       return new Promise(function(resolve, reject) {
         var url = new URL(pickGasUrl());
         url.searchParams.set('action', action);
@@ -325,30 +342,54 @@
         xhr.setRequestHeader('Accept', 'application/json');
         xhr.timeout = 20000;
         xhr.ontimeout = function() {
-          reject(new Error('เชื่อมต่อเซิร์ฟเวอร์หมดเวลา — ลองใหม่อีกครั้ง'));
+          var err = new Error('เชื่อมต่อเซิร์ฟเวอร์หมดเวลา — ลองใหม่อีกครั้ง');
+          err.transient = true;
+          reject(err);
         };
         xhr.onload = function() {
           if (xhr.status >= 200 && xhr.status < 300) {
             try {
               var data = JSON.parse(xhr.responseText);
               if (data && data.error && !data.success) {
-                reject(new Error(data.message || data.error));
+                reject(new Error(data.message || data.error)); // application-level: ไม่ retry
               } else {
                 resolve(data);
               }
             } catch (e) {
               console.error('GAS response is not JSON:', xhr.responseText.substring(0, 200));
-              reject(new Error('เซิร์ฟเวอร์ส่งข้อมูลผิดรูปแบบ'));
+              var err = new Error('เซิร์ฟเวอร์ส่งข้อมูลผิดรูปแบบ');
+              err.transient = true;
+              reject(err);
             }
           } else {
-            reject(new Error('HTTP ' + xhr.status));
+            var err = new Error('HTTP ' + xhr.status);
+            err.transient = true; // 404/5xx จาก GAS มักเป็น redirect chain สะดุดชั่วคราว
+            reject(err);
           }
         };
         xhr.onerror = function() {
           console.error('XHR error — ลอง: 1) เช็ค GAS_URLS  2) Deploy ด้วย "Anyone"  3) ใช้ local server แทนเปิด file://');
-          reject(new Error('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ — ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต'));
+          var err = new Error('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ — ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต');
+          err.transient = true;
+          reject(err);
         };
         xhr.send();
+      });
+    }
+
+    function delay(ms) {
+      return new Promise(function(resolve) { setTimeout(resolve, ms); });
+    }
+
+    function gasCall(action, payload, _retriesLeft) {
+      if (_retriesLeft === undefined) _retriesLeft = 2;
+      return gasCallOnce(action, payload).catch(function(err) {
+        if (err.transient && _retriesLeft > 0) {
+          return delay(700).then(function() {
+            return gasCall(action, payload, _retriesLeft - 1);
+          });
+        }
+        throw err;
       });
     }
 
@@ -603,186 +644,74 @@
     // ============================================================
     let revealedWinners = [];
     let isSpinningSlot = false;
-    let wheelCtrl = null;
+    let crowdNames = []; // ชื่อคนตอบถูกทั้งหมดที่ render เป็น grid อยู่ตอนนี้
 
-    // ============================================================
-    // Prize Wheel — วาดวงล้อด้วย canvas แล้วหมุนด้วย rAF จนหยุดตรงผู้ชนะ
-    // ที่ server สุ่มมาแล้ว (วงล้อนี้เป็นแค่ภาพเอฟเฟกต์ ไม่ได้เป็นตัวสุ่มจริง)
-    // ============================================================
+    const CHASE_STEP_DELAYS = [70, 70, 80, 90, 100, 120, 140, 170, 210, 260, 320, 400, 500, 650];
+    const CROWD_COLUMNS = 4; // ต้องตรงกับ grid-cols-4 ที่ตั้งไว้ใน HTML ของ #crowdGrid
+    const CROWD_ROW_HEIGHT = 86; // ประมาณ cell height + row-gap ไว้คำนวณตำแหน่ง auto-scroll คร่าวๆ
+
     function normNameCompare(s) { return String(s || '').trim().toUpperCase(); }
 
-    // กำหนดขนาดกรอบวงล้อ (px ตรงๆ) จากความกว้าง "เนื้อที่จริง" ของการ์ดที่ครอบอยู่
-    // (หัก padding ของการ์ดออกด้วย เพราะ clientWidth รวม padding มาด้วย ถ้าไม่หักจะคำนวณ
-    // พื้นที่ว่างเกินจริงแล้ววงล้อยังล้นกรอบได้) แทนที่จะพึ่ง aspect-ratio + percentage-height
-    // ซึ่งบางเบราว์เซอร์/มือถือ resolve ไม่ตรงกัน
-    function getContentWidth(el) {
-      const cs = window.getComputedStyle(el);
-      const padL = parseFloat(cs.paddingLeft) || 0;
-      const padR = parseFloat(cs.paddingRight) || 0;
-      return Math.max(0, el.clientWidth - padL - padR);
+    // ============================================================
+    // Crowd Grid — แสดงคนตอบถูกทั้งหมดเป็นไอคอนคน + ชื่อ แล้ว "สปอตไลต์" ไล่ไฮไลท์
+    // ไปเรื่อยๆ (สุ่มดูวุ่นวายเป็นเอฟเฟกต์เฉยๆ ไม่ได้เป็นตัวสุ่มจริง — server สุ่มมาแล้ว)
+    // ก่อนไปหยุดค้างที่คนซึ่ง server สุ่มได้จริง
+    // ============================================================
+    function ensureCrowdGrid(names) {
+      const grid = document.getElementById('crowdGrid');
+      if (grid.childElementCount > 0) return; // สร้างแค่ครั้งแรกของรอบนี้ กันโดนรีเซ็ตสถานะ "ได้รางวัลแล้ว" ทับ
+      crowdNames = names;
+      document.getElementById('crowdCountText').textContent = 'ผู้ตอบถูกทั้งหมด (' + names.length + ' คน)';
+      names.forEach(function(name, i) {
+        const cell = document.createElement('div');
+        cell.className = 'person-cell';
+        cell.innerHTML =
+          '<div style="position: relative;">' +
+            '<div class="person-icon" id="personIcon' + i + '">' +
+              '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+                '<circle cx="12" cy="8" r="3.6"></circle>' +
+                '<path d="M4.5 20.2c1.2-4 4-6.2 7.5-6.2s6.3 2.2 7.5 6.2"></path>' +
+              '</svg>' +
+            '</div>' +
+            '<div class="rank-badge hidden" id="rankBadge' + i + '"></div>' +
+          '</div>' +
+          '<p class="person-name" id="personName' + i + '">' + escHtml(name) + '</p>';
+        grid.appendChild(cell);
+      });
     }
 
-    function sizeWheelWrap(wrap, maxPx, ratio) {
-      const container = wrap.parentElement;
-      const containerWidth = container ? getContentWidth(container) : (wrap.clientWidth || maxPx);
-      const size = Math.max(120, Math.min(maxPx, Math.floor(containerWidth * ratio)));
-      wrap.style.width = size + 'px';
-      wrap.style.height = size + 'px';
-      return size;
+    function scrollCrowdToIndex(index) {
+      const scroller = document.getElementById('crowdScroll');
+      if (!scroller) return;
+      const row = Math.floor(index / CROWD_COLUMNS);
+      const target = row * CROWD_ROW_HEIGHT - (scroller.clientHeight / 2) + (CROWD_ROW_HEIGHT / 2);
+      scroller.scrollTop = Math.max(0, target);
     }
 
-    // สำคัญ: ต้องเซ็ต style.width/height (ขนาดที่แสดงผลจริง) เป็น px ด้วยเสมอ
-    // ไม่งั้น canvas จะแสดงผลตาม attribute width/height ที่คูณ DPR ไว้ (มือถือ 2-3 เท่า) แล้วล้นกรอบ
-    function initWheelCanvas(canvas, size) {
-      const dpr = window.devicePixelRatio || 1;
-      canvas.style.width = size + 'px';
-      canvas.style.height = size + 'px';
-      canvas.width = Math.round(size * dpr);
-      canvas.height = Math.round(size * dpr);
-      canvas.dataset.logicalSize = size;
-      const ctx = canvas.getContext('2d');
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    function setHighlight(index) {
+      crowdNames.forEach(function(_, i) {
+        if (i === index) return;
+        const icon = document.getElementById('personIcon' + i);
+        if (icon && !icon.classList.contains('is-won')) icon.classList.remove('is-highlighted');
+      });
+      const icon = document.getElementById('personIcon' + index);
+      if (icon && !icon.classList.contains('is-won')) icon.classList.add('is-highlighted');
+      scrollCrowdToIndex(index);
     }
 
-    // วัดความกว้างจริงด้วย ctx.measureText() แทนนับจำนวนตัวอักษร เพราะฟอนต์ไทยกว้าง/แคบ
-    // ต่อตัวอักษรไม่เท่าอังกฤษ — ถ้าตัดคำแค่ตาม .length ชื่อภาษาไทยบางชื่ออาจกว้างเกินจริง
-    // ยื่นทะลุจุดศูนย์กลางไปโดนขอบวงอีกฝั่งแล้วถูก ctx.clip() ตัดออก เหลือเห็นแค่ 1-2 ตัวท้าย
-    function fitLabelToWidth(ctx, text, maxWidth) {
-      if (ctx.measureText(text).width <= maxWidth) return text;
-      let lo = 0, hi = text.length - 1, best = 0;
-      while (lo <= hi) {
-        const mid = (lo + hi) >> 1;
-        const candidate = text.slice(0, mid + 1) + '…';
-        if (ctx.measureText(candidate).width <= maxWidth) {
-          best = mid + 1;
-          lo = mid + 1;
-        } else {
-          hi = mid - 1;
-        }
+    function markWon(index, rank) {
+      const icon = document.getElementById('personIcon' + index);
+      const badge = document.getElementById('rankBadge' + index);
+      const nameEl = document.getElementById('personName' + index);
+      if (icon) {
+        icon.classList.remove('is-highlighted');
+        icon.classList.add('is-won', 'won-pop');
       }
-      return best > 0 ? text.slice(0, best) + '…' : '…';
-    }
-
-    function drawWheelSegments(canvas, names) {
-      const ctx = canvas.getContext('2d');
-      const size = parseFloat(canvas.dataset.logicalSize) || canvas.width;
-      const cx = size / 2, cy = size / 2, radius = size / 2 - 3;
-      const n = Math.max(names.length, 1);
-      const anglePer = (2 * Math.PI) / n;
-      const colorA = 'rgba(179, 131, 60, 0.88)';
-      const colorB = 'rgba(19, 24, 41, 0.92)';
-
-      ctx.clearRect(0, 0, size, size);
-
-      // Safari/WebKit ไม่ clip เนื้อหาที่วาดด้วย canvas ตาม CSS border-radius อย่างน่าเชื่อถือ
-      // (ต่างจาก Chrome/Firefox) — บังคับ clip เป็นวงกลมที่ตัว context เองกันตัวหนังสือ/ขอบ
-      // segment โผล่พ้นวงไปที่มุมสี่เหลี่ยมของ canvas บน iPhone
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-      ctx.clip();
-
-      for (let i = 0; i < n; i++) {
-        const start = -Math.PI / 2 + i * anglePer;
-        const end = start + anglePer;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.arc(cx, cy, radius, start, end);
-        ctx.closePath();
-        ctx.fillStyle = (i % 2 === 0) ? colorA : colorB;
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(255,255,255,0.12)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-
-        if (anglePer > 0.16 && names[i]) {
-          const midAngle = start + anglePer / 2;
-          // ครึ่งซ้ายของวงล้อ (cos < 0) ถ้าหมุนตามมุมช่องตรงๆ ตัวหนังสือจะหัวกลับ
-          // ต้องหมุนกลับอีก 180° แล้วสลับ textAlign/ตำแหน่ง x เพื่อให้ยังชิดขอบวงเดิม
-          // แต่ตัวอักษรหัวตั้งอ่านออกทั้งสองฝั่ง
-          const needsFlip = Math.cos(midAngle) < 0;
-          ctx.save();
-          ctx.translate(cx, cy);
-          ctx.rotate(midAngle);
-          ctx.textBaseline = 'middle';
-          ctx.fillStyle = (i % 2 === 0) ? '#0a0d16' : '#e3c785';
-          ctx.font = '600 13px Prompt, sans-serif';
-          const raw = String(names[i]);
-          const maxTextWidth = Math.max(16, (radius - 8) * 0.72);
-          const label = fitLabelToWidth(ctx, raw, maxTextWidth);
-          if (needsFlip) {
-            ctx.rotate(Math.PI);
-            ctx.textAlign = 'left';
-            ctx.fillText(label, -(radius - 8), 0);
-          } else {
-            ctx.textAlign = 'right';
-            ctx.fillText(label, radius - 8, 0);
-          }
-          ctx.restore();
-        }
+      if (badge) {
+        badge.textContent = rank;
+        badge.classList.remove('hidden');
       }
-
-      ctx.restore(); // ปลด clip
-    }
-
-    function createWheelController(canvas) {
-      return {
-        canvas: canvas,
-        rotation: 0,
-        raf: null,
-        spinning: false,
-        startFastSpin: function() {
-          this.spinning = true;
-          const speed = 360 / 650; // deg ต่อ ms
-          let last = performance.now();
-          const self = this;
-          function step(t) {
-            if (!self.spinning) return;
-            const dt = t - last; last = t;
-            self.rotation += speed * dt;
-            self.canvas.style.transform = 'rotate(' + (self.rotation % 360) + 'deg)';
-            self.raf = requestAnimationFrame(step);
-          }
-          this.raf = requestAnimationFrame(step);
-        },
-        stopAndLandOn: function(names, winnerName, durationMs, onDone) {
-          this.spinning = false;
-          if (this.raf) cancelAnimationFrame(this.raf);
-          const n = names.length;
-          if (n === 0) { onDone && onDone(); return; }
-
-          let winnerIndex = names.findIndex(function(nm) { return normNameCompare(nm) === normNameCompare(winnerName); });
-          if (winnerIndex === -1) winnerIndex = Math.floor(Math.random() * n);
-
-          const anglePerDeg = 360 / n;
-          const sliceCenterDeg = winnerIndex * anglePerDeg + anglePerDeg / 2;
-          const jitter = (Math.random() * 2 - 1) * (anglePerDeg * 0.3);
-          const targetWithinSlice = ((sliceCenterDeg + jitter) % 360 + 360) % 360;
-          const currentMod = ((this.rotation % 360) + 360) % 360;
-          let neededMod = (360 - targetWithinSlice) % 360;
-          let delta = neededMod - currentMod;
-          if (delta < 0) delta += 360;
-          const extraSpins = 3;
-          const finalRotation = this.rotation + delta + extraSpins * 360;
-
-          const startRotation = this.rotation;
-          const startTime = performance.now();
-          const self = this;
-          function animate(t) {
-            const elapsed = t - startTime;
-            const progress = Math.min(1, elapsed / durationMs);
-            const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
-            self.rotation = startRotation + (finalRotation - startRotation) * eased;
-            self.canvas.style.transform = 'rotate(' + self.rotation + 'deg)';
-            if (progress < 1) {
-              self.raf = requestAnimationFrame(animate);
-            } else {
-              onDone && onDone();
-            }
-          }
-          this.raf = requestAnimationFrame(animate);
-        }
-      };
+      if (nameEl) nameEl.classList.add('is-won-name');
     }
 
     // ============================================================
@@ -884,26 +813,40 @@
       const display = document.getElementById('slotDisplay');
       const winnersArea = document.getElementById('winnersArea');
       const winnersList = document.getElementById('winnersList');
-      const wheelCanvas = document.getElementById('wheelCanvas');
+      const prizeBadge = document.getElementById('prizeBadge');
 
       slotArea.classList.remove('hidden');
       winnersArea.classList.remove('hidden');
-      display.classList.remove('winner-reveal');
-      display.textContent = 'กำลังหมุน...';
+      display.textContent = 'กำลังสุ่ม...';
+      prizeBadge.textContent = revealedWinners.length + ' / ' + totalPrizes + ' รางวัล';
 
-      const names = allCorrectNames.length > 0 ? allCorrectNames : ['...'];
-      const wheelSize = sizeWheelWrap(wheelCanvas.parentElement, 280, 0.85);
-      initWheelCanvas(wheelCanvas, wheelSize);
-      drawWheelSegments(wheelCanvas, names);
-      if (!wheelCtrl) wheelCtrl = createWheelController(wheelCanvas);
-      wheelCtrl.startFastSpin();
+      ensureCrowdGrid(allCorrectNames.length > 0 ? allCorrectNames : ['...']);
 
-      setTimeout(function() {
-        wheelCtrl.stopAndLandOn(names, nextWinnerName, 2200, function() {
-          display.textContent = nextWinnerName;
-          display.classList.add('winner-reveal');
+      let targetIndex = crowdNames.findIndex(function(nm) { return normNameCompare(nm) === normNameCompare(nextWinnerName); });
+      if (targetIndex === -1) targetIndex = 0;
 
+      const alreadyWonNormalized = revealedWinners.map(function(nm) { return normNameCompare(nm); });
+      const eligible = crowdNames
+        .map(function(_, i) { return i; })
+        .filter(function(i) { return alreadyWonNormalized.indexOf(normNameCompare(crowdNames[i])) === -1; });
+      if (eligible.length === 0) eligible.push(targetIndex);
+
+      let step = 0;
+      function runStep() {
+        const isLastStep = step >= CHASE_STEP_DELAYS.length - 1;
+        const idx = isLastStep ? targetIndex : eligible[Math.floor(Math.random() * eligible.length)];
+        setHighlight(idx);
+
+        const delay = CHASE_STEP_DELAYS[step];
+        if (!isLastStep) {
+          step++;
+          setTimeout(runStep, delay);
+          return;
+        }
+
+        setTimeout(function() {
           // บันทึกว่าแสดงคนนี้แล้ว
+          markWon(targetIndex, rank);
           revealedWinners.push(nextWinnerName);
 
           // เพิ่มการ์ดผู้ชนะ
@@ -917,6 +860,7 @@
             '<p class="font-display text-xl font-semibold gold-text">' + escHtml(nextWinnerName) + '</p>';
           winnersList.appendChild(card);
 
+          prizeBadge.textContent = revealedWinners.length + ' / ' + totalPrizes + ' รางวัล';
           launchConfetti();
 
           setTimeout(function() {
@@ -930,8 +874,9 @@
               display.textContent = 'รอแอดมินสุ่มรางวัลถัดไป';
             }
           }, 1200);
-        });
-      }, 500);
+        }, delay);
+      }
+      runStep();
     }
 
     // ============================================================
