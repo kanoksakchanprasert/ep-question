@@ -322,8 +322,15 @@
 
     // ============================================================
     // API Helper — เรียก GAS ผ่าน XHR (รองรับ GAS redirect 302)
+    // GAS เองบางครั้ง redirect chain สะดุดเฉยๆ (เจอจริง: 404 ชั่วคราวที่หายไปเองพอลองใหม่)
+    // เลย retry อัตโนมัติเฉพาะ action ที่ "อ่านอย่างเดียว/ปลอดภัยจะเรียกซ้ำ" เท่านั้น —
+    // ห้าม retry action ที่เขียนข้อมูลแบบไม่ idempotent (เช่น drawNextWinner) เพราะถ้า
+    // request แรกสำเร็จจริงฝั่ง server แต่ response หลุดหาย การ retry จะไปสุ่ม/บันทึกซ้ำสอง
+    // ครั้งจริงโดยไม่ตั้งใจ — action พวกนั้นให้ fail แล้วให้แอดมินกดใหม่เองแทน
     // ============================================================
-    function gasCall(action, payload) {
+    var SAFE_TO_RETRY_ACTIONS = ['checkLogin', 'getAdminConfig', 'getStatus', 'getCorrect', 'getAll'];
+
+    function gasCallOnce(action, payload) {
       return new Promise(function(resolve, reject) {
         var url = new URL(GAS_URL);
         url.searchParams.set('action', action);
@@ -336,30 +343,56 @@
         xhr.setRequestHeader('Accept', 'application/json');
         xhr.timeout = 20000;
         xhr.ontimeout = function() {
-          reject(new Error('เชื่อมต่อ GAS หมดเวลา — ลองใหม่อีกครั้ง'));
+          var err = new Error('เชื่อมต่อ GAS หมดเวลา — ลองใหม่อีกครั้ง');
+          err.transient = true;
+          reject(err);
         };
         xhr.onload = function() {
           if (xhr.status >= 200 && xhr.status < 300) {
             try {
               var data = JSON.parse(xhr.responseText);
               if (data && data.error && !data.success) {
-                reject(new Error(data.message || data.error));
+                reject(new Error(data.message || data.error)); // application-level: ไม่ retry
               } else {
                 resolve(data);
               }
             } catch (e) {
               console.error('GAS response is not JSON:', xhr.responseText.substring(0, 200));
-              reject(new Error('เซิร์ฟเวอร์ส่งข้อมูลผิดรูปแบบ: ' + xhr.responseText.substring(0, 100)));
+              var err = new Error('เซิร์ฟเวอร์ส่งข้อมูลผิดรูปแบบ: ' + xhr.responseText.substring(0, 100));
+              err.transient = true;
+              reject(err);
             }
           } else {
-            reject(new Error('HTTP ' + xhr.status));
+            var err = new Error('HTTP ' + xhr.status);
+            err.transient = true; // 404/5xx จาก GAS มักเป็น redirect chain สะดุดชั่วคราว
+            reject(err);
           }
         };
         xhr.onerror = function() {
           console.error('XHR error — ลอง: 1) เช็ค GAS_URL  2) Deploy ด้วย "Anyone"  3) ใช้ local server แทนเปิด file://');
-          reject(new Error('เชื่อมต่อ GAS ไม่ได้ — ตรวจสอบการเชื่อมต่ออินเทอร์เน็ตหรือ URL'));
+          var err = new Error('เชื่อมต่อ GAS ไม่ได้ — ตรวจสอบการเชื่อมต่ออินเทอร์เน็ตหรือ URL');
+          err.transient = true;
+          reject(err);
         };
         xhr.send();
+      });
+    }
+
+    function delay(ms) {
+      return new Promise(function(resolve) { setTimeout(resolve, ms); });
+    }
+
+    function gasCall(action, payload, _retriesLeft) {
+      if (_retriesLeft === undefined) {
+        _retriesLeft = SAFE_TO_RETRY_ACTIONS.indexOf(action) !== -1 ? 2 : 0;
+      }
+      return gasCallOnce(action, payload).catch(function(err) {
+        if (err.transient && _retriesLeft > 0) {
+          return delay(700).then(function() {
+            return gasCall(action, payload, _retriesLeft - 1);
+          });
+        }
+        throw err;
       });
     }
 
