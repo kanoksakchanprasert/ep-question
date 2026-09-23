@@ -5,115 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>๐EP๐ GVG Admin</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap');
-
-    :root {
-      color-scheme: light;
-      --bg-deep: #f7f2e7;
-      --bg-mid: #efe4cf;
-      --panel: rgba(255, 255, 255, 0.62);
-      --panel-soft: rgba(255, 255, 255, 0.46);
-      --border-soft: rgba(43, 36, 27, 0.10);
-      --gold: #b3833c;
-      --gold-light: #d1a052;
-      --gold-dim: rgba(179, 131, 60, 0.16);
-      --gold-border: rgba(179, 131, 60, 0.32);
-      --ink: #2b241b;
-      --ink-dim: #6f6455;
-      --ink-faint: #8f8371;
-      --rose: #b1453c;
-      --sage: #4c7a52;
-      --gold-text: #8f6427;
-      --on-accent: #2a1c08;
-    }
-
-    * { font-family: 'Prompt', sans-serif; -webkit-tap-highlight-color: transparent; }
-    .font-display { font-family: 'Cormorant Garamond', serif; letter-spacing: 0.03em; }
-
-    body {
-      background: linear-gradient(170deg, var(--bg-deep) 0%, var(--bg-mid) 55%, var(--bg-deep) 100%);
-      min-height: 100dvh;
-      color: var(--ink);
-      padding-left: env(safe-area-inset-left);
-      padding-right: env(safe-area-inset-right);
-      padding-bottom: env(safe-area-inset-bottom);
-    }
-
-    .glass { background: var(--panel); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid var(--border-soft); }
-    .glass-card { background: var(--panel-soft); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid var(--border-soft); }
-    .gold-text { background: linear-gradient(135deg, var(--gold), var(--gold-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .text-gold { color: var(--gold-text); }
-    .text-gold-dim { color: var(--ink-dim); }
-    .gold-border { border: 1px solid var(--gold-border); }
-
-    .btn-gold { background: var(--gold); color: var(--on-accent); transition: all 0.25s ease; }
-    .btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 10px 22px rgba(179, 131, 60, 0.22); }
-    .btn-gold:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
-
-    .btn-outline { background: rgba(43, 36, 27, 0.04); border: 1px solid var(--border-soft); color: var(--ink); transition: all 0.2s ease; }
-    .btn-outline:hover { border-color: var(--gold-border); color: var(--gold); }
-    .btn-outline:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    .btn-danger { background: rgba(177, 69, 60, 0.1); border: 1px solid rgba(177, 69, 60, 0.28); color: var(--rose); transition: all 0.2s ease; }
-    .btn-danger:hover { background: rgba(177, 69, 60, 0.18); }
-
-    .input-dark {
-      background: rgba(255, 255, 255, 0.55); border: 1px solid var(--border-soft);
-      color: var(--ink); transition: border-color 0.25s; color-scheme: light;
-      font-size: 16px !important;
-    }
-    .input-dark::placeholder { color: var(--ink-faint); }
-    .input-dark:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 0 3px var(--gold-dim); }
-
-    input[type="datetime-local"] { color-scheme: light; cursor: pointer; }
-    input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-      cursor: pointer;
-      filter: sepia(85%) saturate(500%) hue-rotate(2deg) brightness(0.85);
-      opacity: 0.85; padding: 4px 6px; border-radius: 6px;
-      background-color: var(--gold-dim);
-      transition: all 0.2s ease;
-    }
-    input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover { opacity: 1; background-color: var(--gold-border); }
-
-    .fade-in { animation: fadeIn 0.5s ease-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .winner-card { animation: winnerPop 0.5s ease-out; }
-    @keyframes winnerPop { 0% { transform: scale(0.5); opacity: 0; } 70% { transform: scale(1.05); } 100% { transform: scale(1); opacity: 1; } }
-    .correct-row { background: rgba(76, 122, 82, 0.10); border-left: 2px solid var(--sage); }
-
-    .eyebrow { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); font-weight: 500; }
-
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: rgba(43, 36, 27, 0.06); }
-    ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
-
-    .tab-bar { position: sticky; top: 0; z-index: 30; padding: 0.5rem 0 0.75rem; background: linear-gradient(to bottom, var(--bg-deep) 65%, transparent); }
-    .tab-btn { color: var(--ink-dim); transition: all 0.2s ease; }
-    .tab-btn.active { background: var(--gold); color: var(--on-accent); }
-
-    .modal-overlay { position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 1rem; }
-
-    .toast-ok { border: 1px solid var(--gold-border); color: var(--gold-text); }
-    .toast-error { border: 1px solid rgba(177, 69, 60, 0.35); color: var(--rose); }
-
-    /* Prize wheel */
-    .wheel-wrap { position: relative; width: 160px; height: 160px; margin: 0 auto; }
-    /* width/height ที่แท้จริงถูกกำหนดเป็น px จาก JS (initWheelCanvas) เสมอ
-       ที่นี่ใส่ width/height สำรองไว้ด้วย เผื่อ canvas โผล่มาให้เห็นก่อน JS จะรันเสร็จ
-       กัน canvas เพี้ยนเป็นวงรีตามขนาด default ของ browser (300x150) ก่อนโดน round เป็นวงกลม */
-    .wheel-canvas { display: block; width: 160px; height: 160px; border-radius: 50%; clip-path: circle(50%); background: var(--bg-deep); box-shadow: inset 0 0 0 4px var(--gold-border), 0 6px 18px rgba(0,0,0,0.16); }
-    .wheel-pointer {
-      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-      width: 0; height: 0; border-left: 13px solid transparent; border-right: 13px solid transparent;
-      border-top: 21px solid var(--gold); z-index: 5; filter: drop-shadow(0 2px 2px rgba(0,0,0,.25));
-    }
-    .wheel-hub {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-      width: 36px; height: 36px; border-radius: 50%; background: var(--gold);
-      border: 4px solid var(--bg-deep); z-index: 4; box-shadow: 0 2px 6px rgba(0,0,0,.18);
-    }
-  </style>
+  <link rel="stylesheet" href="../shared/theme.css" />
 </head>
 <body>
 
@@ -150,7 +42,7 @@
       <!-- Loading Banner ตอนกำลัง Sync ข้อมูล -->
       <div id="syncLoadingBanner" class="hidden glass gold-border rounded-xl p-3 mb-4 flex items-center justify-center gap-2.5 text-xs text-gold">
         <span class="inline-block w-3.5 h-3.5 border-2 border-t-transparent rounded-full animate-spin" style="border-color: var(--gold); border-top-color: transparent;"></span>
-        <span class="font-medium">กำลังซิงค์ข้อมูลกับ Google Sheet กรุณารอสักครู่</span>
+        <span class="font-medium">กำลังซิงค์ข้อมูลกับ Firestore กรุณารอสักครู่</span>
       </div>
 
       <!-- สถานะ -->
@@ -233,24 +125,13 @@
         <div class="space-y-3">
           <button onclick="doFetchCorrect()" id="btnFetch" class="btn-outline w-full py-2.5 rounded-xl font-medium text-sm">ดึงรายชื่อคนตอบถูก</button>
 
-          <!-- รายชื่อคนตอบถูก -->
-          <div id="correctListContainer" class="hidden">
-            <div class="flex items-center justify-between mb-2">
-              <span class="eyebrow">คนตอบถูกทั้งหมด</span>
-              <span id="correctCount" class="text-xs font-medium" style="color: var(--sage);">0 คน</span>
+          <!-- รายชื่อคนตอบถูก + สปอตไลต์ตอนสุ่ม (หน้าตาเหมือนหน้า client — โค้ดอยู่ใน shared/crowd-grid.js) -->
+          <div id="correctListContainer" class="hidden glass-card gold-border rounded-2xl p-4 max-w-sm w-full mx-auto">
+            <p id="adminSlotDisplay" class="eyebrow mb-3">พร้อมสุ่มรางวัล</p>
+            <p id="crowdCountText" class="eyebrow mb-2">ผู้ตอบถูกทั้งหมด (0 คน)</p>
+            <div id="crowdScroll" class="crowd-scroll">
+              <div id="crowdGrid" class="grid grid-cols-4 gap-x-1.5 gap-y-3.5"></div>
             </div>
-            <div id="correctList" class="max-h-40 overflow-y-auto space-y-1 mb-3"></div>
-          </div>
-
-          <!-- Slot Animation Box ตอนกดสุ่ม -->
-          <div id="adminSlotBox" class="hidden glass gold-border rounded-xl p-4 text-center">
-            <p class="eyebrow mb-2">กำลังสุ่มผู้โชคดี</p>
-            <div class="wheel-wrap mb-3">
-              <div class="wheel-pointer"></div>
-              <div class="wheel-hub"></div>
-              <canvas id="adminWheelCanvas" class="wheel-canvas"></canvas>
-            </div>
-            <div id="adminSlotDisplay" class="text-xl font-semibold gold-text py-2">—</div>
           </div>
 
           <!-- ปุ่มสุ่มทีละคน (Primary) -->
@@ -313,94 +194,34 @@
     </div>
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="../firebase-config.js"></script>
+  <script src="../shared/firebase-init.js"></script>
+  <script src="../shared/data.js"></script>
+  <script src="../shared/admin-data.js"></script>
+  <script src="../shared/crowd-grid.js"></script>
+
   <script>
     // ============================================================
-    // CONFIG — ใส่ URL ของ GAS Web App "โปรเจกต์ ADMIN" ที่ Deploy แล้ว
-    // (ต้อง deploy จาก gas-admin/Code.gs แยกโปรเจกต์จาก Client)
+    // Login — Firebase Auth ต้องใช้ email แต่หน้าตายังกรอกแค่ username/password เหมือนเดิม
+    // (EPAdmin.signIn แปะโดเมนปลอมต่อท้ายให้เอง) สถานะล็อกอินคงอยู่ข้ามการรีเฟรชด้วย
+    // onAuthChange แทนการเก็บ user/pass ไว้ใน memory แล้วแนบไปทุก request แบบเดิม
     // ============================================================
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxneVh6djgC61gb9rjJXKxXaj7mKOD4U72qlJpoekwHjBeLqaXm64OVXiwpYHUlgzmIig/exec';
-
-    // ============================================================
-    // API Helper — เรียก GAS ผ่าน XHR (รองรับ GAS redirect 302)
-    // GAS เองบางครั้ง redirect chain สะดุดเฉยๆ (เจอจริง: 404 ชั่วคราวที่หายไปเองพอลองใหม่)
-    // เลย retry อัตโนมัติเฉพาะ action ที่ "อ่านอย่างเดียว/ปลอดภัยจะเรียกซ้ำ" เท่านั้น —
-    // ห้าม retry action ที่เขียนข้อมูลแบบไม่ idempotent (เช่น drawNextWinner) เพราะถ้า
-    // request แรกสำเร็จจริงฝั่ง server แต่ response หลุดหาย การ retry จะไปสุ่ม/บันทึกซ้ำสอง
-    // ครั้งจริงโดยไม่ตั้งใจ — action พวกนั้นให้ fail แล้วให้แอดมินกดใหม่เองแทน
-    // ============================================================
-    var SAFE_TO_RETRY_ACTIONS = ['checkLogin', 'getAdminConfig', 'getStatus', 'getCorrect', 'getAll'];
-
-    function gasCallOnce(action, payload) {
-      return new Promise(function(resolve, reject) {
-        var url = new URL(GAS_URL);
-        url.searchParams.set('action', action);
-        if (payload !== undefined) {
-          url.searchParams.set('payload', JSON.stringify(payload));
-        }
-
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', url.toString());
-        xhr.setRequestHeader('Accept', 'application/json');
-        xhr.timeout = 20000;
-        xhr.ontimeout = function() {
-          var err = new Error('เชื่อมต่อ GAS หมดเวลา — ลองใหม่อีกครั้ง');
-          err.transient = true;
-          reject(err);
-        };
-        xhr.onload = function() {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            try {
-              var data = JSON.parse(xhr.responseText);
-              if (data && data.error && !data.success) {
-                reject(new Error(data.message || data.error)); // application-level: ไม่ retry
-              } else {
-                resolve(data);
-              }
-            } catch (e) {
-              console.error('GAS response is not JSON:', xhr.responseText.substring(0, 200));
-              var err = new Error('เซิร์ฟเวอร์ส่งข้อมูลผิดรูปแบบ: ' + xhr.responseText.substring(0, 100));
-              err.transient = true;
-              reject(err);
-            }
-          } else {
-            var err = new Error('HTTP ' + xhr.status);
-            err.transient = true; // 404/5xx จาก GAS มักเป็น redirect chain สะดุดชั่วคราว
-            reject(err);
-          }
-        };
-        xhr.onerror = function() {
-          console.error('XHR error — ลอง: 1) เช็ค GAS_URL  2) Deploy ด้วย "Anyone"  3) ใช้ local server แทนเปิด file://');
-          var err = new Error('เชื่อมต่อ GAS ไม่ได้ — ตรวจสอบการเชื่อมต่ออินเทอร์เน็ตหรือ URL');
-          err.transient = true;
-          reject(err);
-        };
-        xhr.send();
-      });
-    }
-
-    function delay(ms) {
-      return new Promise(function(resolve) { setTimeout(resolve, ms); });
-    }
-
-    function gasCall(action, payload, _retriesLeft) {
-      if (_retriesLeft === undefined) {
-        _retriesLeft = SAFE_TO_RETRY_ACTIONS.indexOf(action) !== -1 ? 2 : 0;
+    EPAdmin.onAuthChange(function (user) {
+      if (user) {
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('adminDashboard').classList.remove('hidden');
+        switchTab('tabSetup');
+        startDeadlineWatcher();
+        startAdminWatchers();
+      } else {
+        stopAdminWatchers();
+        document.getElementById('adminDashboard').classList.add('hidden');
+        document.getElementById('loginScreen').classList.remove('hidden');
       }
-      return gasCallOnce(action, payload).catch(function(err) {
-        if (err.transient && _retriesLeft > 0) {
-          return delay(700).then(function() {
-            return gasCall(action, payload, _retriesLeft - 1);
-          });
-        }
-        throw err;
-      });
-    }
-
-    // ============================================================
-    // Login
-    // ============================================================
-    let adminAuthUser = '';
-    let adminAuthPass = '';
+    });
 
     async function doLogin() {
       const user = document.getElementById('loginUser').value.trim();
@@ -409,20 +230,14 @@
 
       const btn = document.getElementById('btnLogin');
       btn.disabled = true; btn.textContent = 'กำลังเข้าสู่ระบบ...';
+      document.getElementById('loginError').classList.add('hidden');
 
       try {
-        const res = await gasCall('checkLogin', { user, pass });
-        if (res && res.ok) {
-          adminAuthUser = user;
-          adminAuthPass = pass;
-          document.getElementById('loginScreen').classList.add('hidden');
-          document.getElementById('adminDashboard').classList.remove('hidden');
-          switchTab('tabSetup');
-          startDeadlineWatcher();
-          loadCurrentConfig();
-        } else {
+        const res = await EPAdmin.signIn(user, pass);
+        if (!res.ok) {
           document.getElementById('loginError').classList.remove('hidden');
         }
+        // สำเร็จ: onAuthChange ด้านบนจะสลับหน้าจอ + เริ่ม watcher ให้เองอัตโนมัติ
       } catch (err) {
         showToast('เชื่อมต่อไม่ได้: ' + (err.message || err), true);
       } finally {
@@ -474,187 +289,8 @@
     let adminPrizeCount = 1;
     let adminCorrectList = [];
     let adminTotalCorrect = null;
-    let adminWheelCtrl = null;
-
-    // ============================================================
-    // Prize Wheel — วาดวงล้อด้วย canvas แล้วหมุนด้วย rAF จนหยุดตรงผู้ชนะ
-    // ที่ server สุ่มมาแล้ว (วงล้อนี้เป็นแค่ภาพเอฟเฟกต์ ไม่ได้เป็นตัวสุ่มจริง)
-    // ============================================================
-    function normNameCompare(s) { return String(s || '').trim().toUpperCase(); }
-
-    // กำหนดขนาดกรอบวงล้อ (px ตรงๆ) จากความกว้าง "เนื้อที่จริง" ของการ์ดที่ครอบอยู่
-    // (หัก padding ของการ์ดออกด้วย เพราะ clientWidth รวม padding มาด้วย ถ้าไม่หักจะคำนวณ
-    // พื้นที่ว่างเกินจริงแล้ววงล้อยังล้นกรอบได้) แทนที่จะพึ่ง aspect-ratio + percentage-height
-    // ซึ่งบางเบราว์เซอร์/มือถือ resolve ไม่ตรงกัน
-    function getContentWidth(el) {
-      const cs = window.getComputedStyle(el);
-      const padL = parseFloat(cs.paddingLeft) || 0;
-      const padR = parseFloat(cs.paddingRight) || 0;
-      return Math.max(0, el.clientWidth - padL - padR);
-    }
-
-    function sizeWheelWrap(wrap, maxPx, ratio) {
-      const container = wrap.parentElement;
-      const containerWidth = container ? getContentWidth(container) : (wrap.clientWidth || maxPx);
-      const size = Math.max(120, Math.min(maxPx, Math.floor(containerWidth * ratio)));
-      wrap.style.width = size + 'px';
-      wrap.style.height = size + 'px';
-      return size;
-    }
-
-    // สำคัญ: ต้องเซ็ต style.width/height (ขนาดที่แสดงผลจริง) เป็น px ด้วยเสมอ
-    // ไม่งั้น canvas จะแสดงผลตาม attribute width/height ที่คูณ DPR ไว้ (มือถือ 2-3 เท่า) แล้วล้นกรอบ
-    function initWheelCanvas(canvas, size) {
-      const dpr = window.devicePixelRatio || 1;
-      canvas.style.width = size + 'px';
-      canvas.style.height = size + 'px';
-      canvas.width = Math.round(size * dpr);
-      canvas.height = Math.round(size * dpr);
-      canvas.dataset.logicalSize = size;
-      const ctx = canvas.getContext('2d');
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-
-    // วัดความกว้างจริงด้วย ctx.measureText() แทนนับจำนวนตัวอักษร เพราะฟอนต์ไทยกว้าง/แคบ
-    // ต่อตัวอักษรไม่เท่าอังกฤษ — ถ้าตัดคำแค่ตาม .length ชื่อภาษาไทยบางชื่ออาจกว้างเกินจริง
-    // ยื่นทะลุจุดศูนย์กลางไปโดนขอบวงอีกฝั่งแล้วถูก ctx.clip() ตัดออก เหลือเห็นแค่ 1-2 ตัวท้าย
-    function fitLabelToWidth(ctx, text, maxWidth) {
-      if (ctx.measureText(text).width <= maxWidth) return text;
-      let lo = 0, hi = text.length - 1, best = 0;
-      while (lo <= hi) {
-        const mid = (lo + hi) >> 1;
-        const candidate = text.slice(0, mid + 1) + '…';
-        if (ctx.measureText(candidate).width <= maxWidth) {
-          best = mid + 1;
-          lo = mid + 1;
-        } else {
-          hi = mid - 1;
-        }
-      }
-      return best > 0 ? text.slice(0, best) + '…' : '…';
-    }
-
-    function drawWheelSegments(canvas, names) {
-      const ctx = canvas.getContext('2d');
-      const size = parseFloat(canvas.dataset.logicalSize) || canvas.width;
-      const cx = size / 2, cy = size / 2, radius = size / 2 - 3;
-      const n = Math.max(names.length, 1);
-      const anglePer = (2 * Math.PI) / n;
-      const colorA = 'rgba(179, 131, 60, 0.88)';
-      const colorB = 'rgba(19, 24, 41, 0.92)';
-
-      ctx.clearRect(0, 0, size, size);
-
-      // Safari/WebKit ไม่ clip เนื้อหาที่วาดด้วย canvas ตาม CSS border-radius อย่างน่าเชื่อถือ
-      // (ต่างจาก Chrome/Firefox) — บังคับ clip เป็นวงกลมที่ตัว context เองกันตัวหนังสือ/ขอบ
-      // segment โผล่พ้นวงไปที่มุมสี่เหลี่ยมของ canvas บน iPhone
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-      ctx.clip();
-
-      for (let i = 0; i < n; i++) {
-        const start = -Math.PI / 2 + i * anglePer;
-        const end = start + anglePer;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.arc(cx, cy, radius, start, end);
-        ctx.closePath();
-        ctx.fillStyle = (i % 2 === 0) ? colorA : colorB;
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(255,255,255,0.12)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-
-        if (anglePer > 0.16 && names[i]) {
-          const midAngle = start + anglePer / 2;
-          // ครึ่งซ้ายของวงล้อ (cos < 0) ถ้าหมุนตามมุมช่องตรงๆ ตัวหนังสือจะหัวกลับ
-          // ต้องหมุนกลับอีก 180° แล้วสลับ textAlign/ตำแหน่ง x เพื่อให้ยังชิดขอบวงเดิม
-          // แต่ตัวอักษรหัวตั้งอ่านออกทั้งสองฝั่ง
-          const needsFlip = Math.cos(midAngle) < 0;
-          ctx.save();
-          ctx.translate(cx, cy);
-          ctx.rotate(midAngle);
-          ctx.textBaseline = 'middle';
-          ctx.fillStyle = (i % 2 === 0) ? '#0a0d16' : '#e3c785';
-          ctx.font = '600 12px Prompt, sans-serif';
-          const raw = String(names[i]);
-          const maxTextWidth = Math.max(14, (radius - 8) * 0.70);
-          const label = fitLabelToWidth(ctx, raw, maxTextWidth);
-          if (needsFlip) {
-            ctx.rotate(Math.PI);
-            ctx.textAlign = 'left';
-            ctx.fillText(label, -(radius - 8), 0);
-          } else {
-            ctx.textAlign = 'right';
-            ctx.fillText(label, radius - 8, 0);
-          }
-          ctx.restore();
-        }
-      }
-
-      ctx.restore(); // ปลด clip
-    }
-
-    function createWheelController(canvas) {
-      return {
-        canvas: canvas,
-        rotation: 0,
-        raf: null,
-        spinning: false,
-        startFastSpin: function() {
-          this.spinning = true;
-          const speed = 360 / 650; // deg ต่อ ms
-          let last = performance.now();
-          const self = this;
-          function step(t) {
-            if (!self.spinning) return;
-            const dt = t - last; last = t;
-            self.rotation += speed * dt;
-            self.canvas.style.transform = 'rotate(' + (self.rotation % 360) + 'deg)';
-            self.raf = requestAnimationFrame(step);
-          }
-          this.raf = requestAnimationFrame(step);
-        },
-        stopAndLandOn: function(names, winnerName, durationMs, onDone) {
-          this.spinning = false;
-          if (this.raf) cancelAnimationFrame(this.raf);
-          const n = names.length;
-          if (n === 0) { onDone && onDone(); return; }
-
-          let winnerIndex = names.findIndex(function(nm) { return normNameCompare(nm) === normNameCompare(winnerName); });
-          if (winnerIndex === -1) winnerIndex = Math.floor(Math.random() * n);
-
-          const anglePerDeg = 360 / n;
-          const sliceCenterDeg = winnerIndex * anglePerDeg + anglePerDeg / 2;
-          const jitter = (Math.random() * 2 - 1) * (anglePerDeg * 0.3);
-          const targetWithinSlice = ((sliceCenterDeg + jitter) % 360 + 360) % 360;
-          const currentMod = ((this.rotation % 360) + 360) % 360;
-          let neededMod = (360 - targetWithinSlice) % 360;
-          let delta = neededMod - currentMod;
-          if (delta < 0) delta += 360;
-          const extraSpins = 3;
-          const finalRotation = this.rotation + delta + extraSpins * 360;
-
-          const startRotation = this.rotation;
-          const startTime = performance.now();
-          const self = this;
-          function animate(t) {
-            const elapsed = t - startTime;
-            const progress = Math.min(1, elapsed / durationMs);
-            const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
-            self.rotation = startRotation + (finalRotation - startRotation) * eased;
-            self.canvas.style.transform = 'rotate(' + self.rotation + 'deg)';
-            if (progress < 1) {
-              self.raf = requestAnimationFrame(animate);
-            } else {
-              onDone && onDone();
-            }
-          }
-          this.raf = requestAnimationFrame(animate);
-        }
-      };
-    }
+    let adminShownWinners = ''; // ผู้ชนะที่ grid วางสถานะไว้แล้ว (ไว้เทียบกับที่ watcher ส่งมา จะได้ไม่วาด grid ทับโดยไม่จำเป็น)
+    let isAdminDrawing = false; // กำลังเล่นแอนิเมชันสุ่มอยู่ — กันปุ่ม/รายชื่อผู้ชนะเผยผลก่อนสปอตไลต์หยุด
 
     // ============================================================
     // ควบคุม Loading / Sync State ของฟอร์ม
@@ -724,69 +360,88 @@
     }
 
     // ============================================================
-    // โหลด Config ปัจจุบัน + สถานะการสุ่ม (พร้อม Loading Screen)
+    // Realtime watchers — แทนการยิง getAdminConfig/getStatus ทุกครั้งที่ต้องรีเฟรชข้อมูล
+    //
+    // แบ่งเป็น 2 ชั้นตั้งใจ:
+    // 1) โหลด config เต็ม (รวม correctAnswer) ครั้งเดียวตอนล็อกอิน/รีเฟรช เพื่อเติมฟอร์ม —
+    //    เหมือนพฤติกรรมเดิมของ loadCurrentConfig() ทุกประการ
+    // 2) หลังจากนั้นผูก onSnapshot ไว้อัปเดตแค่ status badge/deadline banner/ปุ่มสุ่ม
+    //    "สด" ต่อเนื่อง แต่ไม่แตะค่าในฟอร์ม — กันไม่ให้ snapshot จากที่อื่น (เช่นแอดมินอีกคน
+    //    ขยายเวลา) มาทับข้อความที่แอดมินคนนี้กำลังพิมพ์ตั้งคำถามรอบใหม่อยู่
     // ============================================================
-    async function loadCurrentConfig() {
+    let unsubAdminConfig = null;
+    let unsubAdminWinners = null;
+
+    async function startAdminWatchers() {
       setFormLoading(true);
       try {
-        const [cfg, statusData] = await Promise.all([
-          gasCall('getAdminConfig', { user: adminAuthUser, pass: adminAuthPass }),
-          gasCall('getStatus').catch(function() { return null; })
-        ]);
-
-        if (!cfg || cfg.status === 'NoData') {
-          adminEndTime = null;
-          updateStatusBadge('NoData');
-          clearFormInputs();
-          adminWinners = [];
-          adminPrizeCount = 1;
-          adminCorrectList = [];
-          adminTotalCorrect = null;
-          renderWinnersList();
-          return;
-        }
-
-        adminEndTime = cfg.endTime || null;
-        updateStatusBadge(cfg.status);
-        adminPrizeCount = parseInt(cfg.prizeCount) || 1;
-
-        // เติมข้อมูลลงฟอร์ม
-        document.getElementById('cfgQuestion').value = cfg.question || '';
-        document.getElementById('cfgOptA').value = cfg.optionA || '';
-        document.getElementById('cfgOptB').value = cfg.optionB || '';
-        document.getElementById('cfgOptC').value = cfg.optionC || '';
-        document.getElementById('cfgOptD').value = cfg.optionD || '';
-        document.getElementById('cfgCorrect').value = cfg.correctAnswer || 'A';
-        document.getElementById('cfgPrize').value = adminPrizeCount;
-
-        if (cfg.endTime) {
-          try {
-            const d = new Date(cfg.endTime);
-            document.getElementById('cfgEndTime').value = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-          } catch (e) {
-            document.getElementById('cfgEndTime').value = cfg.endTime;
-          }
-        } else {
-          document.getElementById('cfgEndTime').value = '';
-        }
-
-        if (statusData) {
-          adminWinners = Array.isArray(statusData.winners) ? statusData.winners : [];
-          adminPrizeCount = parseInt(statusData.prizeCount) || adminPrizeCount;
-          if (typeof statusData.totalCorrect === 'number') {
-            adminTotalCorrect = statusData.totalCorrect;
-          }
-          if (Array.isArray(statusData.correctRespondents)) {
-            adminCorrectList = statusData.correctRespondents;
-          }
-          renderWinnersList();
-        }
+        const cfg = await EPAdmin.getAdminConfig();
+        applyConfigToForm(cfg);
       } catch (err) {
         showToast('ซิงค์ข้อมูลไม่สำเร็จ: ' + (err.message || err), true);
         updateStatusBadge('NoData');
       } finally {
         setFormLoading(false);
         updateDrawControls();
+      }
+
+      unsubAdminConfig = EPData.watchConfig(function (cfg) {
+        adminEndTime = cfg.status === 'NoData' ? null : (cfg.endTime || null);
+        if (cfg.status !== 'NoData') {
+          adminPrizeCount = parseInt(cfg.prizeCount) || adminPrizeCount;
+        }
+        updateStatusBadge(cfg.status);
+        updateDrawControls();
+      }, function () { /* error ตอน bootstrap ข้างบนแจ้งไปแล้ว ไม่ต้องซ้ำ */ });
+
+      unsubAdminWinners = EPData.watchWinners(function (list) {
+        adminWinners = list;
+        renderWinnersList();
+        if (!isAdminDrawing && crowdNames.length > 0 && winnersKey(adminWinners) !== adminShownWinners) rebuildAdminCrowd();
+      }, function () {});
+    }
+
+    function stopAdminWatchers() {
+      if (unsubAdminConfig) { unsubAdminConfig(); unsubAdminConfig = null; }
+      if (unsubAdminWinners) { unsubAdminWinners(); unsubAdminWinners = null; }
+      if (deadlineCheckTimer) { clearInterval(deadlineCheckTimer); deadlineCheckTimer = null; }
+    }
+
+    function applyConfigToForm(cfg) {
+      if (!cfg || cfg.status === 'NoData') {
+        adminEndTime = null;
+        updateStatusBadge('NoData');
+        clearFormInputs();
+        adminWinners = [];
+        adminPrizeCount = 1;
+        adminCorrectList = [];
+        adminTotalCorrect = null;
+        renderWinnersList();
+        clearAdminCrowd();
+        return;
+      }
+
+      adminEndTime = cfg.endTime || null;
+      updateStatusBadge(cfg.status);
+      adminPrizeCount = parseInt(cfg.prizeCount) || 1;
+
+      document.getElementById('cfgQuestion').value = cfg.question || '';
+      document.getElementById('cfgOptA').value = cfg.optionA || '';
+      document.getElementById('cfgOptB').value = cfg.optionB || '';
+      document.getElementById('cfgOptC').value = cfg.optionC || '';
+      document.getElementById('cfgOptD').value = cfg.optionD || '';
+      document.getElementById('cfgCorrect').value = cfg.correctAnswer || 'A';
+      document.getElementById('cfgPrize').value = adminPrizeCount;
+
+      if (cfg.endTime) {
+        try {
+          const d = new Date(cfg.endTime);
+          document.getElementById('cfgEndTime').value = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+        } catch (e) {
+          document.getElementById('cfgEndTime').value = cfg.endTime;
+        }
+      } else {
+        document.getElementById('cfgEndTime').value = '';
       }
     }
 
@@ -817,8 +472,8 @@
       const endTimeRaw = document.getElementById('cfgEndTime').value;
       if (!endTimeRaw) { showToast('กรุณาตั้งเวลาสิ้นสุด', true); return; }
 
-      // แปลงเป็น UTC ISO string ที่ชัดเจนก่อนส่ง — ป้องกัน Google Sheets ตีความ timezone
-      // ของ string เปล่าๆ (ไม่มี zone info) ผิดไปจาก timezone ที่แอดมินตั้งใจเลือกจริง
+      // แปลงเป็น UTC ISO string ที่ชัดเจนก่อนส่ง — ป้องกันการตีความ timezone ของ string
+      // เปล่าๆ (ไม่มี zone info) ผิดไปจาก timezone ที่แอดมินตั้งใจเลือกจริง
       const endTimeISO = new Date(endTimeRaw).toISOString();
 
       const data = {
@@ -839,20 +494,20 @@
       btn.innerHTML = '<span class="inline-block w-3.5 h-3.5 border-2 border-t-transparent rounded-full animate-spin align-[-2px] mr-2" style="border-color: var(--on-accent); border-top-color: transparent;"></span>กำลังบันทึก...';
 
       try {
-        const res = await gasCall('saveConfig', data);
+        const res = await EPAdmin.saveConfig(data);
         if (res && res.success) {
           showToast(res.message || 'บันทึกสำเร็จ — กิจกรรมเปิดแล้ว');
           adminEndTime = endTimeISO;
           updateStatusBadge('Open');
 
-          // รีเซ็ตสถานะการสุ่มสำหรับรอบใหม่ทันที
+          // รีเซ็ตสถานะการสุ่มสำหรับรอบใหม่ทันที (ก่อน watcher จะยืนยันตามมา)
           adminWinners = [];
           adminPrizeCount = prizeCountVal;
           adminCorrectList = [];
           adminTotalCorrect = null;
           renderWinnersList();
 
-          document.getElementById('correctListContainer').classList.add('hidden');
+          clearAdminCrowd();
           document.getElementById('drawResultContainer').classList.add('hidden');
           document.getElementById('allListContainer').classList.add('hidden');
         } else {
@@ -890,7 +545,7 @@
       btn.disabled = true; btn.textContent = 'กำลังขยายเวลา...';
 
       try {
-        const res = await gasCall('extendEndTime', { user: adminAuthUser, pass: adminAuthPass, endTime: endTimeISO });
+        const res = await EPAdmin.extendEndTime(endTimeISO);
         if (res && res.success) {
           showToast(res.message || 'ขยายเวลาสิ้นสุดเรียบร้อย');
           adminEndTime = endTimeISO;
@@ -914,30 +569,12 @@
       btn.disabled = true; btn.textContent = 'กำลังโหลด...';
 
       try {
-        const list = await gasCall('getCorrect', { user: adminAuthUser, pass: adminAuthPass });
-        const container = document.getElementById('correctListContainer');
-        const listEl = document.getElementById('correctList');
-        const countEl = document.getElementById('correctCount');
-
-        container.classList.remove('hidden');
+        const list = await EPAdmin.getCorrectRespondents();
         const safeList = Array.isArray(list) ? list : [];
         adminCorrectList = safeList.map(function(item) { return item.ign; });
         adminTotalCorrect = safeList.length;
         updateDrawControls();
-        countEl.textContent = safeList.length + ' คน';
-        listEl.innerHTML = '';
-
-        if (safeList.length === 0) {
-          listEl.innerHTML = '<p class="text-xs text-gold-dim text-center py-3">ยังไม่มีคนตอบถูก</p>';
-        } else {
-          safeList.forEach(function(item, i) {
-            const div = document.createElement('div');
-            div.className = 'correct-row rounded-lg px-3 py-2 flex items-center justify-between';
-            div.innerHTML = '<span class="text-sm font-medium" style="color:var(--sage)">' + (i + 1) + '. ' + escHtml(item.ign) + '</span>' +
-              '<span class="text-xs text-gold-dim">' + escHtml(String(item.timestamp)) + '</span>';
-            listEl.appendChild(div);
-          });
-        }
+        rebuildAdminCrowd();
       } catch (err) {
         showToast(err.message || err, true);
       } finally {
@@ -945,7 +582,27 @@
       }
     }
 
+    // วาด grid รายชื่อคนตอบถูกใหม่ทั้งหมด (หน้าตาเดียวกับหน้า client) แล้ววางสถานะผู้ชนะที่ได้รางวัลไปแล้ว
+    function winnersKey(list) { return JSON.stringify(list); }
+
+    // winners = ผู้ชนะที่จะวางสถานะบน grid (ค่าเริ่มต้นคือทุกคนที่มีอยู่ตอนนี้)
+    function rebuildAdminCrowd(winners) {
+      winners = winners || adminWinners;
+      resetCrowdGrid();
+      adminShownWinners = winnersKey(winners);
+      document.getElementById('correctListContainer').classList.remove('hidden');
+      document.getElementById('adminSlotDisplay').textContent = 'พร้อมสุ่มรางวัล';
+      ensureCrowdGrid(adminCorrectList);
+      markAllWon(winners);
+    }
+
+    function clearAdminCrowd() {
+      resetCrowdGrid();
+      document.getElementById('correctListContainer').classList.add('hidden');
+    }
+
     function updateDrawControls() {
+      if (isAdminDrawing) return; // ปุ่มถูกล็อกไว้ระหว่างสปอตไลต์วิ่ง — จะถูกอัปเดตตอนหยุดแล้ว
       const drawnCount = adminWinners.length;
       const total = adminPrizeCount;
       // ถ้าจำนวนคนตอบถูกจริงน้อยกว่าจำนวนรางวัลที่ตั้งไว้ ให้ถือว่า "ครบ" เมื่อสุ่มได้ทุกคนแล้ว
@@ -979,6 +636,7 @@
     function renderWinnersList() {
       const container = document.getElementById('drawResultContainer');
       const listEl = document.getElementById('drawResult');
+      if (isAdminDrawing) return; // กันผลโผล่ก่อนสปอตไลต์หยุด — จะเรียกซ้ำตอนหยุดแล้ว
       updateDrawControls();
 
       if (adminWinners.length === 0) {
@@ -1008,73 +666,77 @@
     // ============================================================
     async function doDrawNextWinner() {
       const btn = document.getElementById('btnDrawNext');
+      const btnAll = document.getElementById('btnDrawAll');
+      const slotDisplay = document.getElementById('adminSlotDisplay');
+      isAdminDrawing = true;
       btn.disabled = true;
+      btnAll.disabled = true;
       btn.textContent = 'กำลังสุ่ม...';
 
       // ดึงรายชื่อคนตอบถูกล่าสุดก่อนสุ่ม
       try {
         if (adminCorrectList.length === 0) {
-          const list = await gasCall('getCorrect', { user: adminAuthUser, pass: adminAuthPass });
+          const list = await EPAdmin.getCorrectRespondents();
           if (Array.isArray(list)) {
             adminCorrectList = list.map(function(item) { return item.ign; });
           }
         }
       } catch (_) {}
 
-      // แสดง Wheel บนหน้า Admin — หมุนเร็วระหว่างรอผลจาก server
-      const slotBox = document.getElementById('adminSlotBox');
-      const slotDisplay = document.getElementById('adminSlotDisplay');
-      const wheelCanvas = document.getElementById('adminWheelCanvas');
-      slotBox.classList.remove('hidden');
-      slotDisplay.textContent = 'กำลังหมุน...';
-
-      const names = adminCorrectList.length > 0 ? adminCorrectList : ['...'];
-      const wheelSize = sizeWheelWrap(wheelCanvas.parentElement, 220, 0.82);
-      initWheelCanvas(wheelCanvas, wheelSize);
-      drawWheelSegments(wheelCanvas, names);
-      if (!adminWheelCtrl) adminWheelCtrl = createWheelController(wheelCanvas);
-      adminWheelCtrl.startFastSpin();
+      if (crowdNames.length === 0 && adminCorrectList.length > 0) rebuildAdminCrowd();
+      slotDisplay.textContent = 'กำลังสุ่ม...';
 
       try {
-        const res = await gasCall('drawNextWinner');
+        const res = await EPAdmin.drawNextWinner();
 
         if (!res || !res.success) {
-          adminWheelCtrl.spinning = false;
-          if (adminWheelCtrl.raf) cancelAnimationFrame(adminWheelCtrl.raf);
-          slotBox.classList.add('hidden');
+          isAdminDrawing = false;
+          slotDisplay.textContent = 'พร้อมสุ่มรางวัล';
           showToast((res && (res.message || res.error)) || 'ไม่สามารถสุ่มได้', true);
           updateDrawControls();
           return;
         }
 
-        // ชะลอวงล้อให้หยุดตรงชื่อผู้ชนะที่ server สุ่มมาแล้ว
-        adminWheelCtrl.stopAndLandOn(names, res.winner, 2200, function() {
-          slotDisplay.textContent = res.winner;
-        });
-        showToast(res.message);
-
-        if (Array.isArray(res.winners)) {
-          adminWinners = res.winners;
-        } else if (res.winner) {
-          adminWinners.push(res.winner);
-        }
+        const allWinners = Array.isArray(res.winners) ? res.winners : adminWinners.concat(res.winner ? [res.winner] : []);
+        const winnerPos = allWinners.indexOf(res.winner);
+        const rank = winnerPos === -1 ? allWinners.length : winnerPos + 1;
+        const wonBefore = allWinners.slice(0, rank - 1);
+        adminWinners = allWinners;
         if (typeof res.totalCorrect === 'number') {
           adminTotalCorrect = res.totalCorrect;
         }
 
-        renderWinnersList();
+        // grid ยังว่าง หรือไม่มีชื่อผู้ชนะ (รายชื่อเก่า/ไม่เคยดึง) → ดึงรายชื่อใหม่ ถ้ายังไม่มีอีกใช้รายชื่อผู้ชนะแทน (เหมือนหน้า client)
+        if (findCrowdIndex(res.winner) === -1) {
+          try {
+            const list = await EPAdmin.getCorrectRespondents();
+            if (Array.isArray(list)) adminCorrectList = list.map(function(item) { return item.ign; });
+          } catch (_) {}
+          const inList = adminCorrectList.some(function(nm) { return normNameCompare(nm) === normNameCompare(res.winner); });
+          if (!inList) adminCorrectList = allWinners.slice();
+          rebuildAdminCrowd(wonBefore); // ยังไม่วางสถานะผู้ชนะคนใหม่ ไม่งั้นผลโผล่ก่อนสปอตไลต์หยุด
+          slotDisplay.textContent = 'กำลังสุ่ม...';
+        }
+        let targetIndex = findCrowdIndex(res.winner);
+        if (targetIndex === -1) targetIndex = 0;
 
-        updateStatusBadge(res.isComplete ? 'Drawn' : 'Drawing');
-
-        // ซ่อน wheel box หลังวงล้อหยุดและแสดงผลแล้วสักครู่
-        setTimeout(function() {
-          slotBox.classList.add('hidden');
-        }, 3200);
+        // สปอตไลต์ไล่ไฮไลท์แล้วไปหยุดที่ผู้ชนะที่ server สุ่มมาแล้ว (เป็นแค่เอฟเฟกต์ ไม่ได้เป็นตัวสุ่มจริง)
+        runCrowdChase(targetIndex, wonBefore, function() {
+          try {
+            markWon(targetIndex, rank);
+            adminShownWinners = winnersKey(adminWinners);
+            slotDisplay.textContent = 'รางวัลที่ ' + rank + ': ' + res.winner;
+            showToast(res.message);
+          } finally {
+            isAdminDrawing = false; // ต้องปลดล็อกเสมอ ไม่งั้นปุ่มสุ่มค้างถาวร
+          }
+          renderWinnersList();
+          updateStatusBadge(res.isComplete ? 'Drawn' : 'Drawing');
+        });
 
       } catch (err) {
-        adminWheelCtrl.spinning = false;
-        if (adminWheelCtrl.raf) cancelAnimationFrame(adminWheelCtrl.raf);
-        slotBox.classList.add('hidden');
+        isAdminDrawing = false;
+        slotDisplay.textContent = 'พร้อมสุ่มรางวัล';
         showToast(err.message || err, true);
         updateDrawControls();
       }
@@ -1084,13 +746,14 @@
     // สุ่มที่เหลือทั้งหมด
     // ============================================================
     async function doDrawAllRemaining() {
+      if (isAdminDrawing) return;
       if (!(await showConfirm('ต้องการสุ่มผู้ชนะที่เหลือทั้งหมดในครั้งเดียวเลยหรือไม่?'))) return;
 
       const btn = document.getElementById('btnDrawAll');
       btn.disabled = true; btn.textContent = 'กำลังสุ่ม...';
 
       try {
-        const res = await gasCall('drawWinners');
+        const res = await EPAdmin.drawWinners();
         if (!res || !res.success) {
           showToast((res && (res.message || res.error)) || 'เกิดข้อผิดพลาดในการสุ่ม', true);
           return;
@@ -1104,6 +767,7 @@
           adminTotalCorrect = res.totalCorrect;
         }
         renderWinnersList();
+        if (crowdNames.length > 0) rebuildAdminCrowd();
         updateStatusBadge('Drawn');
       } catch (err) {
         showToast(err.message || err, true);
@@ -1117,14 +781,16 @@
     // ล้างเฉพาะผู้ชนะ เพื่อเริ่มสุ่มใหม่
     // ============================================================
     async function doResetWinners() {
+      if (isAdminDrawing) return;
       if (!(await showConfirm('ต้องการล้างรายชื่อผู้ชนะเพื่อเริ่มสุ่มใหม่ใช่หรือไม่? (คำตอบของลูกกิลด์จะไม่หาย)'))) return;
 
       try {
-        const res = await gasCall('resetWinners');
+        const res = await EPAdmin.resetWinnersOnly();
         if (res && res.success) {
           showToast(res.message || 'ล้างผลสุ่มเรียบร้อย');
           adminWinners = [];
           renderWinnersList();
+          if (crowdNames.length > 0) rebuildAdminCrowd();
           updateStatusBadge('Open');
         } else {
           showToast((res && (res.message || res.error)) || 'ล้างผลสุ่มไม่สำเร็จ', true);
@@ -1139,7 +805,7 @@
     // ============================================================
     async function doFetchAll() {
       try {
-        const list = await gasCall('getAll');
+        const list = await EPAdmin.getAllRespondents();
         const container = document.getElementById('allListContainer');
         const listEl = document.getElementById('allList');
         const countEl = document.getElementById('allCount');
@@ -1166,12 +832,12 @@
     }
 
     // ============================================================
-    // Reset กิจกรรมทั้งหมด (เคลียร์ทั้ง Sheet และฟอร์มหน้าจอ)
+    // Reset กิจกรรมทั้งหมด (เคลียร์ทั้ง Firestore และฟอร์มหน้าจอ)
     // ============================================================
     async function doReset() {
       if (!(await showConfirm('ยืนยันรีเซ็ตกิจกรรมทั้งหมด? (ระบบจะสำรองข้อมูลรอบปัจจุบันเข้า History แล้วล้างคำถาม/คำตอบออก)'))) return;
       try {
-        const res = await gasCall('reset');
+        const res = await EPAdmin.resetActivity();
         showToast((res && res.message) || 'รีเซ็ตกิจกรรมเรียบร้อย');
         updateStatusBadge('NoData');
 
@@ -1186,7 +852,7 @@
         adminEndTime = null;
         renderWinnersList();
 
-        document.getElementById('correctListContainer').classList.add('hidden');
+        clearAdminCrowd();
         document.getElementById('drawResultContainer').classList.add('hidden');
         document.getElementById('allListContainer').classList.add('hidden');
       } catch (err) {

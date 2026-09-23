@@ -1,0 +1,194 @@
+/* Cream/gold theme — copied verbatim from ep-question/index.html's <style> block so this
+   version looks identical to the live app. Do not fork this file per-page; both index.html
+   and admin/index.html include it. */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap');
+
+:root {
+  color-scheme: light;
+  --bg-deep: #f7f2e7;
+  --bg-mid: #efe4cf;
+  --panel: rgba(255, 255, 255, 0.62);
+  --panel-soft: rgba(255, 255, 255, 0.46);
+  --border-soft: rgba(43, 36, 27, 0.10);
+  --gold: #b3833c;
+  --gold-light: #d1a052;
+  --gold-dim: rgba(179, 131, 60, 0.16);
+  --gold-border: rgba(179, 131, 60, 0.32);
+  --ink: #2b241b;
+  --ink-dim: #6f6455;
+  --ink-faint: #8f8371;
+  --rose: #b1453c;
+  --sage: #4c7a52;
+  --gold-text: #8f6427;
+  --on-accent: #2a1c08;
+}
+
+* { font-family: 'Prompt', sans-serif; -webkit-tap-highlight-color: transparent; }
+.font-display { font-family: 'Cormorant Garamond', serif; letter-spacing: 0.03em; }
+
+body {
+  background: linear-gradient(170deg, var(--bg-deep) 0%, var(--bg-mid) 55%, var(--bg-deep) 100%);
+  min-height: 100dvh;
+  color: var(--ink);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.glass {
+  background: var(--panel);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--border-soft);
+}
+.glass-card {
+  background: var(--panel-soft);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-soft);
+}
+.gold-text {
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.text-gold { color: var(--gold-text); }
+.text-gold-dim { color: var(--ink-dim); }
+.gold-border { border: 1px solid var(--gold-border); }
+.gold-glow { box-shadow: 0 0 28px rgba(179, 131, 60, 0.18); }
+
+.btn-gold { background: var(--gold); color: var(--on-accent); transition: all 0.25s ease; }
+.btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 10px 22px rgba(179, 131, 60, 0.22); }
+.btn-gold:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.input-dark {
+  background: rgba(255, 255, 255, 0.55); border: 1px solid var(--border-soft);
+  color: var(--ink); transition: border-color 0.25s;
+  font-size: 16px !important;
+}
+.input-dark::placeholder { color: var(--ink-faint); }
+.input-dark:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 0 3px var(--gold-dim); }
+
+.fade-in { animation: fadeIn 0.6s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+.eyebrow { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); font-weight: 500; }
+.divider-gold { width: 3rem; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin: 0 auto; }
+
+.toast-ok { border: 1px solid var(--gold-border); color: var(--gold-text); }
+.toast-error { border: 1px solid rgba(177, 69, 60, 0.35); color: var(--rose); }
+
+/* Radio — touch-friendly */
+.option-radio { display: none; }
+.option-label {
+  display: flex; align-items: center; gap: 0.85rem; padding: 1rem 1.15rem;
+  border-radius: 0.85rem; cursor: pointer; transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.5); border: 1px solid var(--border-soft);
+}
+.option-label:active { transform: scale(0.985); }
+.option-radio:checked + .option-label { border-color: var(--gold); background: var(--gold-dim); }
+.option-dot {
+  width: 19px; height: 19px; border-radius: 50%;
+  border: 1.5px solid rgba(43, 36, 27, 0.18);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all 0.2s;
+}
+.option-radio:checked + .option-label .option-dot { border-color: var(--gold); background: var(--gold); }
+.option-radio:checked + .option-label .option-dot::after { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--bg-deep); }
+.option-key {
+  width: 25px; height: 25px; border-radius: 7px;
+  background: rgba(43, 36, 27, 0.05);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; color: var(--ink-dim); flex-shrink: 0;
+}
+.option-radio:checked + .option-label .option-key { background: var(--gold-dim); color: var(--gold-text); }
+
+/* Countdown */
+.countdown-ring { background: conic-gradient(var(--gold) var(--progress, 100%), rgba(43,36,27,0.08) 0); border-radius: 50%; padding: 3px; }
+.countdown-inner { background: var(--bg-deep); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+/* Winner reveal — crowd grid + spotlight chase-light */
+/* overflow-y:auto ตัดเนื้อหาที่ล้นออกนอก padding box ด้วย — ต้องเผื่อ padding ไว้รอบ grid
+   ไม่งั้น rank badge (top:-6px) ของแถวบนสุด และแสงเรืองของไอคอนที่ไฮไลท์ จะโดนตัดแหว่ง */
+.crowd-scroll { max-height: 300px; overflow-y: auto; padding: 14px 10px 8px; }
+.person-cell { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.person-icon {
+  width: 52px; height: 52px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--panel-soft); border: 2px solid transparent;
+  transition: box-shadow 90ms ease-out, transform 90ms ease-out, background 180ms ease-out, border-color 180ms ease-out;
+}
+.person-icon svg { stroke: var(--ink-dim); transition: stroke 180ms ease-out; }
+.person-icon.is-highlighted {
+  background: var(--gold-dim); border-color: var(--gold); transform: scale(1.12);
+  box-shadow: 0 0 0 4px rgba(179,131,60,0.22), 0 0 14px 4px rgba(179,131,60,0.45);
+}
+.person-icon.is-highlighted svg { stroke: var(--gold-text); }
+.person-icon.is-won {
+  background: var(--gold); border-color: var(--gold-light);
+  box-shadow: 0 0 0 3px var(--gold-dim), 0 4px 14px rgba(179,131,60,0.35);
+}
+.person-icon.is-won svg { stroke: var(--on-accent); }
+.person-name {
+  font-size: 11px; line-height: 1.4; text-align: center; color: var(--ink-dim); margin: 0;
+  max-width: 68px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.person-name.is-won-name { color: var(--gold-text); font-weight: 600; }
+.rank-badge {
+  position: absolute; top: -6px; right: -2px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--rose); color: #fff;
+  font-size: 10px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+}
+.won-pop { animation: wonPop 0.6s ease-out; }
+@keyframes wonPop { 0% { transform: scale(0.7); } 55% { transform: scale(1.16); } 100% { transform: scale(1); } }
+
+.confetti-container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; overflow: hidden; z-index: 100; }
+.confetti { position: absolute; width: 8px; height: 8px; border-radius: 1px; animation: confettiFall linear forwards; }
+@keyframes confettiFall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(540deg); opacity: 0; } }
+
+.pulse-warning { animation: pulseWarn 1.6s ease-in-out infinite; }
+@keyframes pulseWarn { 0%, 100% { box-shadow: 0 0 0 0 rgba(177, 69, 60, 0.28); } 50% { box-shadow: 0 0 0 6px rgba(177, 69, 60, 0); } }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
+
+.submit-bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+  padding: 0.85rem 1.1rem calc(0.85rem + env(safe-area-inset-bottom));
+  background: rgba(247, 242, 231, 0.92);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--gold-border);
+}
+
+/* ============================================================
+   Admin-only — copied verbatim from ep-question/admin/index.html's <style> block.
+   Lives here rather than in a per-page <style> so both pages keep sharing one
+   stylesheet (see the note at the top of this file).
+   ============================================================ */
+.btn-outline { background: rgba(43, 36, 27, 0.04); border: 1px solid var(--border-soft); color: var(--ink); transition: all 0.2s ease; }
+.btn-outline:hover { border-color: var(--gold-border); color: var(--gold); }
+.btn-outline:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-danger { background: rgba(177, 69, 60, 0.1); border: 1px solid rgba(177, 69, 60, 0.28); color: var(--rose); transition: all 0.2s ease; }
+.btn-danger:hover { background: rgba(177, 69, 60, 0.18); }
+
+input[type="datetime-local"] { color-scheme: light; cursor: pointer; }
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: sepia(85%) saturate(500%) hue-rotate(2deg) brightness(0.85);
+  opacity: 0.85; padding: 4px 6px; border-radius: 6px;
+  background-color: var(--gold-dim);
+  transition: all 0.2s ease;
+}
+input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover { opacity: 1; background-color: var(--gold-border); }
+
+.winner-card { animation: winnerPop 0.5s ease-out; }
+@keyframes winnerPop { 0% { transform: scale(0.5); opacity: 0; } 70% { transform: scale(1.05); } 100% { transform: scale(1); opacity: 1; } }
+
+.tab-bar { position: sticky; top: 0; z-index: 30; padding: 0.5rem 0 0.75rem; background: linear-gradient(to bottom, var(--bg-deep) 65%, transparent); }
+.tab-btn { color: var(--ink-dim); transition: all 0.2s ease; }
+.tab-btn.active { background: var(--gold); color: var(--on-accent); }
+
+.modal-overlay { position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 1rem; }
+

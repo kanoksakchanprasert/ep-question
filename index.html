@@ -5,163 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>๐EP๐ GVG Reward</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap');
-
-    :root {
-      color-scheme: light;
-      --bg-deep: #f7f2e7;
-      --bg-mid: #efe4cf;
-      --panel: rgba(255, 255, 255, 0.62);
-      --panel-soft: rgba(255, 255, 255, 0.46);
-      --border-soft: rgba(43, 36, 27, 0.10);
-      --gold: #b3833c;
-      --gold-light: #d1a052;
-      --gold-dim: rgba(179, 131, 60, 0.16);
-      --gold-border: rgba(179, 131, 60, 0.32);
-      --ink: #2b241b;
-      --ink-dim: #6f6455;
-      --ink-faint: #8f8371;
-      --rose: #b1453c;
-      --gold-text: #8f6427;
-      --on-accent: #2a1c08;
-    }
-
-    * { font-family: 'Prompt', sans-serif; -webkit-tap-highlight-color: transparent; }
-    .font-display { font-family: 'Cormorant Garamond', serif; letter-spacing: 0.03em; }
-
-    body {
-      background: linear-gradient(170deg, var(--bg-deep) 0%, var(--bg-mid) 55%, var(--bg-deep) 100%);
-      min-height: 100dvh;
-      color: var(--ink);
-      padding-left: env(safe-area-inset-left);
-      padding-right: env(safe-area-inset-right);
-      padding-bottom: env(safe-area-inset-bottom);
-    }
-
-    .glass {
-      background: var(--panel);
-      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-      border: 1px solid var(--border-soft);
-    }
-    .glass-card {
-      background: var(--panel-soft);
-      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-      border: 1px solid var(--border-soft);
-    }
-    .gold-text {
-      background: linear-gradient(135deg, var(--gold), var(--gold-light));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
-    .text-gold { color: var(--gold-text); }
-    .text-gold-dim { color: var(--ink-dim); }
-    .gold-border { border: 1px solid var(--gold-border); }
-    .gold-glow { box-shadow: 0 0 28px rgba(179, 131, 60, 0.18); }
-
-    .btn-gold { background: var(--gold); color: var(--on-accent); transition: all 0.25s ease; }
-    .btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 10px 22px rgba(179, 131, 60, 0.22); }
-    .btn-gold:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
-
-    .input-dark {
-      background: rgba(255, 255, 255, 0.55); border: 1px solid var(--border-soft);
-      color: var(--ink); transition: border-color 0.25s;
-      font-size: 16px !important;
-    }
-    .input-dark::placeholder { color: var(--ink-faint); }
-    .input-dark:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 0 3px var(--gold-dim); }
-
-    .fade-in { animation: fadeIn 0.6s ease-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-
-    .eyebrow { font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); font-weight: 500; }
-    .divider-gold { width: 3rem; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin: 0 auto; }
-
-    .toast-ok { border: 1px solid var(--gold-border); color: var(--gold-text); }
-    .toast-error { border: 1px solid rgba(177, 69, 60, 0.35); color: var(--rose); }
-
-    /* Radio — touch-friendly */
-    .option-radio { display: none; }
-    .option-label {
-      display: flex; align-items: center; gap: 0.85rem; padding: 1rem 1.15rem;
-      border-radius: 0.85rem; cursor: pointer; transition: all 0.2s ease;
-      background: rgba(255, 255, 255, 0.5); border: 1px solid var(--border-soft);
-    }
-    .option-label:active { transform: scale(0.985); }
-    .option-radio:checked + .option-label { border-color: var(--gold); background: var(--gold-dim); }
-    .option-dot {
-      width: 19px; height: 19px; border-radius: 50%;
-      border: 1.5px solid rgba(43, 36, 27, 0.18);
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; transition: all 0.2s;
-    }
-    .option-radio:checked + .option-label .option-dot { border-color: var(--gold); background: var(--gold); }
-    .option-radio:checked + .option-label .option-dot::after { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--bg-deep); }
-    .option-key {
-      width: 25px; height: 25px; border-radius: 7px;
-      background: rgba(43, 36, 27, 0.05);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 600; color: var(--ink-dim); flex-shrink: 0;
-    }
-    .option-radio:checked + .option-label .option-key { background: var(--gold-dim); color: var(--gold-text); }
-
-    /* Countdown */
-    .countdown-ring { background: conic-gradient(var(--gold) var(--progress, 100%), rgba(43,36,27,0.08) 0); border-radius: 50%; padding: 3px; }
-    .countdown-inner { background: var(--bg-deep); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-
-    /* Winner reveal — crowd grid + spotlight chase-light */
-    .person-cell { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-    .person-icon {
-      width: 52px; height: 52px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      background: var(--panel-soft); border: 2px solid transparent;
-      transition: box-shadow 90ms ease-out, transform 90ms ease-out, background 180ms ease-out, border-color 180ms ease-out;
-    }
-    .person-icon svg { stroke: var(--ink-dim); transition: stroke 180ms ease-out; }
-    .person-icon.is-highlighted {
-      background: var(--gold-dim); border-color: var(--gold); transform: scale(1.12);
-      box-shadow: 0 0 0 4px rgba(179,131,60,0.22), 0 0 26px 8px rgba(179,131,60,0.45);
-    }
-    .person-icon.is-highlighted svg { stroke: var(--gold-text); }
-    .person-icon.is-won {
-      background: var(--gold); border-color: var(--gold-light);
-      box-shadow: 0 0 0 3px var(--gold-dim), 0 4px 14px rgba(179,131,60,0.35);
-    }
-    .person-icon.is-won svg { stroke: var(--on-accent); }
-    .person-name {
-      font-size: 11px; line-height: 1.4; text-align: center; color: var(--ink-dim); margin: 0;
-      max-width: 68px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .person-name.is-won-name { color: var(--gold-text); font-weight: 600; }
-    .rank-badge {
-      position: absolute; top: -6px; right: -2px;
-      width: 18px; height: 18px; border-radius: 50%;
-      background: var(--rose); color: #fff;
-      font-size: 10px; font-weight: 600;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.25);
-    }
-    .won-pop { animation: wonPop 0.6s ease-out; }
-    @keyframes wonPop { 0% { transform: scale(0.7); } 55% { transform: scale(1.16); } 100% { transform: scale(1); } }
-
-    .confetti-container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; overflow: hidden; z-index: 100; }
-    .confetti { position: absolute; width: 8px; height: 8px; border-radius: 1px; animation: confettiFall linear forwards; }
-    @keyframes confettiFall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(540deg); opacity: 0; } }
-
-    .pulse-warning { animation: pulseWarn 1.6s ease-in-out infinite; }
-    @keyframes pulseWarn { 0%, 100% { box-shadow: 0 0 0 0 rgba(177, 69, 60, 0.28); } 50% { box-shadow: 0 0 0 6px rgba(177, 69, 60, 0); } }
-
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
-
-    .submit-bar {
-      position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
-      padding: 0.85rem 1.1rem calc(0.85rem + env(safe-area-inset-bottom));
-      background: rgba(247, 242, 231, 0.92);
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border-top: 1px solid var(--gold-border);
-    }
-  </style>
+  <link rel="stylesheet" href="shared/theme.css" />
 </head>
 <body>
 
@@ -285,7 +129,7 @@
           <span id="prizeBadge" class="text-[11px] font-semibold rounded-full px-2.5 py-1" style="color: var(--gold-text); background: var(--gold-dim);">0 / 0 รางวัล</span>
         </div>
         <p id="crowdCountText" class="eyebrow mb-2">ผู้ตอบถูกทั้งหมด (0 คน)</p>
-        <div id="crowdScroll" class="max-h-[300px] overflow-y-auto pr-1">
+        <div id="crowdScroll" class="crowd-scroll">
           <div id="crowdGrid" class="grid grid-cols-4 gap-x-1.5 gap-y-3.5"></div>
         </div>
       </div>
@@ -307,100 +151,27 @@
     <div class="glass rounded-xl px-5 py-3 text-sm font-medium text-center max-w-xs"></div>
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="shared/firebase-init.js"></script>
+  <script src="shared/data.js"></script>
+  <script src="shared/crowd-grid.js"></script>
+
   <script>
-    // ============================================================
-    // CONFIG — URL ของ GAS Web App "โปรเจกต์ CLIENT" ที่ Deploy แล้ว (deploy ซ้ำจาก
-    // gas-client/Code.gs หลายชุด คนละ Web App URL) — สุ่มเลือก 1 ใน N ทุก request
-    // เพื่อกระจาย concurrent-execution quota ของ GAS ออกจากกัน ไม่ให้ตัวใดตัวหนึ่งรับ
-    // โหลดทั้งหมดตอนคนเข้าพร้อมกันเยอะ
-    // ============================================================
-    const GAS_URLS = [
-      'https://script.google.com/macros/s/AKfycbwMiYrEc058Kr_qeQCfMqQyHfUUiTHVfrCtQYWBGFPZXxCoDhkMgoH6XrC76G07jVRA/exec',
-      'https://script.google.com/macros/s/AKfycbyqUA0US9-XRf7tfXvHXq9-QO5cd2509XCDLTdREeIavQmSf60Mb8IprYwcknTLAHPfww/exec'
-    ];
-    function pickGasUrl() {
-      return GAS_URLS[Math.floor(Math.random() * GAS_URLS.length)];
-    }
-
-    // ============================================================
-    // API Helper — เรียก GAS ผ่าน XHR (รองรับ GAS redirect 302)
-    // GAS เองบางครั้ง redirect chain สะดุดเฉยๆ (เจอจริง: 404 ชั่วคราวที่หายไปเองพอลองใหม่)
-    // เลย retry อัตโนมัติได้ทุก action ที่นี่ (getConfig/getStatus อ่านอย่างเดียว, submitAnswer
-    // ไม่เช็คซ้ำอยู่แล้วจึงเรียกซ้ำได้อย่างปลอดภัย — ดูเหตุผลเรื่อง dedup ที่ getCorrectRespondents
-    // ฝั่ง admin แทน) — สุ่ม URL ใหม่ทุกครั้งที่ retry ด้วย เผื่อ backend ตัวที่โดนสุ่มไปตัวแรกยังค้าง
-    // ============================================================
-    function gasCallOnce(action, payload) {
-      return new Promise(function(resolve, reject) {
-        var url = new URL(pickGasUrl());
-        url.searchParams.set('action', action);
-        if (payload !== undefined) {
-          url.searchParams.set('payload', JSON.stringify(payload));
-        }
-
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', url.toString());
-        xhr.setRequestHeader('Accept', 'application/json');
-        xhr.timeout = 20000;
-        xhr.ontimeout = function() {
-          var err = new Error('เชื่อมต่อเซิร์ฟเวอร์หมดเวลา — ลองใหม่อีกครั้ง');
-          err.transient = true;
-          reject(err);
-        };
-        xhr.onload = function() {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            try {
-              var data = JSON.parse(xhr.responseText);
-              if (data && data.error && !data.success) {
-                reject(new Error(data.message || data.error)); // application-level: ไม่ retry
-              } else {
-                resolve(data);
-              }
-            } catch (e) {
-              console.error('GAS response is not JSON:', xhr.responseText.substring(0, 200));
-              var err = new Error('เซิร์ฟเวอร์ส่งข้อมูลผิดรูปแบบ');
-              err.transient = true;
-              reject(err);
-            }
-          } else {
-            var err = new Error('HTTP ' + xhr.status);
-            err.transient = true; // 404/5xx จาก GAS มักเป็น redirect chain สะดุดชั่วคราว
-            reject(err);
-          }
-        };
-        xhr.onerror = function() {
-          console.error('XHR error — ลอง: 1) เช็ค GAS_URLS  2) Deploy ด้วย "Anyone"  3) ใช้ local server แทนเปิด file://');
-          var err = new Error('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ — ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต');
-          err.transient = true;
-          reject(err);
-        };
-        xhr.send();
-      });
-    }
-
-    function delay(ms) {
-      return new Promise(function(resolve) { setTimeout(resolve, ms); });
-    }
-
-    function gasCall(action, payload, _retriesLeft) {
-      if (_retriesLeft === undefined) _retriesLeft = 2;
-      return gasCallOnce(action, payload).catch(function(err) {
-        if (err.transient && _retriesLeft > 0) {
-          return delay(700).then(function() {
-            return gasCall(action, payload, _retriesLeft - 1);
-          });
-        }
-        throw err;
-      });
-    }
-
     // ============================================================
     // State
     // ============================================================
     let currentConfig  = null;
-    let hasSubmitted    = false;
-    let countdownTimer  = null;
-    let pollingTimer    = null;
-    let isTimeUp        = false;
+    let hasSubmitted   = false;
+    let countdownTimer = null;
+    let isTimeUp       = false;
+    let bootstrapped   = false;
+    let showingResult  = false;
+    let unsubReveal    = null;
+    let latestWinners  = [];
+    let latestReveal   = { correctRespondentIGNs: [], totalCorrect: 0 };
     const LABELS = { A: 'ก', B: 'ข', C: 'ค', D: 'ง' };
     const IGN_STORAGE_KEY = 'ep_gvg_last_ign';
     const SUBMITTED_ROUND_KEY = 'ep_gvg_submitted_round';
@@ -433,16 +204,133 @@
     }
 
     // ============================================================
-    // Init
+    // Init — realtime listeners (แทน fetch ครั้งเดียว + polling ทุก 5 วิ ของเวอร์ชัน GAS)
     // ============================================================
-    async function fetchConfigWithRetry() {
-      try {
-        return await gasCall('getConfig');
-      } catch (err) {
-        // เผื่อเป็นปัญหาเครือข่าย/GAS ตอบช้าชั่วคราว — ลองอีกครั้งก่อนถือว่าล้มเหลวจริง
-        await new Promise(function(r) { setTimeout(r, 1200); });
-        return await gasCall('getConfig');
+    function init() {
+      EPData.watchConfig(handleConfigUpdate, handleWatchError);
+      EPData.watchWinners(function (list) {
+        latestWinners = list;
+        if (bootstrapped && showingResult) evaluateResult();
+      }, handleWatchError);
+    }
+
+    function handleWatchError(err) {
+      hideAll();
+      showNoActivity(true, err);
+    }
+
+    // เรียกทุกครั้งที่ state/config เปลี่ยน รวมถึงครั้งแรกตอนโหลดหน้า (ทำหน้าที่แทน init() เดิม)
+    function handleConfigUpdate(cfg) {
+      const prevEndTime = currentConfig ? currentConfig.endTime : null;
+      const isFirstLoad = !bootstrapped;
+      currentConfig = cfg;
+      bootstrapped = true;
+
+      // ผูก/ถอด listener ของ state/reveal ตามสถานะ — ห้ามผูกตอน Open เพราะ rules ปฏิเสธอ่าน
+      attachRevealWatcherIfNeeded(cfg.status);
+
+      if (isFirstLoad) {
+        bootFromConfig(cfg);
+        return;
       }
+
+      if (cfg.status === 'NoData') {
+        resetToNoActivity();
+        return;
+      }
+
+      if (cfg.status === 'Open') {
+        if (showingResult) {
+          // แอดมินกด "ล้างผลสุ่มใหม่" — กลับสู่รอบเดิมที่ยังเปิดรับคำตอบอยู่
+          resetResultLocalState();
+          enterOpenScreen(cfg);
+          return;
+        }
+        // แอดมินอาจขยายเวลาไปมั้ย — รีสตาร์ท countdown ด้วยเวลาใหม่
+        if (!hasSubmitted && !isTimeUp && cfg.endTime && prevEndTime && cfg.endTime !== prevEndTime) {
+          clearInterval(countdownTimer);
+          startCountdown(cfg.endTime);
+        }
+        return;
+      }
+
+      // Drawing/Drawn
+      evaluateResult();
+    }
+
+    function attachRevealWatcherIfNeeded(status) {
+      const needed = (status === 'Drawing' || status === 'Drawn');
+      if (needed && !unsubReveal) {
+        unsubReveal = EPData.watchReveal(function (reveal) {
+          latestReveal = reveal;
+          if (bootstrapped) evaluateResult();
+        }, handleWatchError);
+      } else if (!needed && unsubReveal) {
+        unsubReveal();
+        unsubReveal = null;
+        latestReveal = { correctRespondentIGNs: [], totalCorrect: 0 };
+      }
+    }
+
+    function bootFromConfig(cfg) {
+      hideAll();
+
+      if (!cfg || cfg.status === 'NoData') {
+        showNoActivity(false);
+        return;
+      }
+
+      if (cfg.status === 'Drawn' || cfg.status === 'Drawing') {
+        show('resultScreen');
+        showingResult = true;
+        evaluateResult();
+        return;
+      }
+
+      enterOpenScreen(cfg);
+    }
+
+    function enterOpenScreen(cfg) {
+      hideAll();
+      showingResult = false;
+
+      const submittedRecord = getSubmittedRoundRecord();
+      if (submittedRecord && submittedRecord.fingerprint === roundFingerprint(cfg)) {
+        // อุปกรณ์นี้ส่งคำตอบรอบนี้ไปแล้ว — กันเนียนพิมพ์ชื่อใหม่ส่งซ้ำจากเครื่องเดิม
+        hasSubmitted = true;
+        isTimeUp = false;
+        document.getElementById('submittedIGN').textContent = submittedRecord.ign;
+        document.getElementById('submittedAns').textContent = LABELS[submittedRecord.answer] + '. ' +
+          (cfg['option' + submittedRecord.answer] || submittedRecord.answer);
+        show('submittedScreen');
+        return;
+      }
+
+      hasSubmitted = false;
+      isTimeUp = false;
+      renderQuiz(cfg);
+      show('quizScreen');
+      const savedIGN = loadSavedIGN();
+      if (savedIGN) document.getElementById('ignInput').value = savedIGN;
+      startCountdown(cfg.endTime);
+    }
+
+    function resetToNoActivity() {
+      clearInterval(countdownTimer);
+      resetResultLocalState();
+      hasSubmitted = false;
+      isTimeUp = false;
+      hideAll();
+      showNoActivity(false);
+    }
+
+    function resetResultLocalState() {
+      showingResult = false;
+      revealedWinners = [];
+      resetCrowdGrid();
+      document.getElementById('winnersList').innerHTML = '';
+      document.getElementById('winnersArea').classList.add('hidden');
+      document.getElementById('slotDisplay').textContent = 'กำลังสุ่มรางวัล';
     }
 
     function showNoActivity(isError, err) {
@@ -458,56 +346,6 @@
         subtitle.textContent = 'กรุณารอแอดมินเปิดกิจกรรม';
       }
       show('noActivityScreen');
-    }
-
-    async function init() {
-      let cfg;
-      try {
-        cfg = await fetchConfigWithRetry();
-      } catch (err) {
-        hideAll();
-        showNoActivity(true, err);
-        return;
-      }
-
-      try {
-        currentConfig = cfg;
-        hideAll();
-
-        if (!cfg || cfg.status === 'NoData') {
-          showNoActivity(false);
-          return;
-        }
-        if (cfg.status === 'Drawn' || cfg.status === 'Drawing') {
-          await showResultScreen();
-          if (cfg.status === 'Drawing') {
-            startPolling();
-          }
-          return;
-        }
-
-        const submittedRecord = getSubmittedRoundRecord();
-        if (submittedRecord && submittedRecord.fingerprint === roundFingerprint(cfg)) {
-          // อุปกรณ์นี้ส่งคำตอบรอบนี้ไปแล้ว — กันเนียนพิมพ์ชื่อใหม่ส่งซ้ำจากเครื่องเดิม
-          hasSubmitted = true;
-          document.getElementById('submittedIGN').textContent = submittedRecord.ign;
-          document.getElementById('submittedAns').textContent = LABELS[submittedRecord.answer] + '. ' +
-            (cfg['option' + submittedRecord.answer] || submittedRecord.answer);
-          show('submittedScreen');
-          startPolling();
-          return;
-        }
-
-        renderQuiz(cfg);
-        show('quizScreen');
-        const savedIGN = loadSavedIGN();
-        if (savedIGN) document.getElementById('ignInput').value = savedIGN;
-        startCountdown(cfg.endTime);
-        startPolling();
-      } catch (err) {
-        hideAll();
-        showNoActivity(true, err);
-      }
     }
 
     // ============================================================
@@ -587,22 +425,8 @@
     function pad(n) { return n < 10 ? '0' + n : String(n); }
 
     // ============================================================
-    // Submit — ลองใหม่อัตโนมัติถ้าเจอ "ระบบมีคนใช้งานพร้อมกันเยอะ" (lock ชั่วคราวตอนคนแห่ส่งพร้อมกัน)
+    // Submit
     // ============================================================
-    async function submitAnswerWithRetry(payload, attemptsLeft) {
-      attemptsLeft = (attemptsLeft === undefined) ? 2 : attemptsLeft;
-      try {
-        return await gasCall('submitAnswer', payload);
-      } catch (err) {
-        const isBusy = /ใช้งานพร้อมกันเยอะ/.test((err && err.message) || '');
-        if (isBusy && attemptsLeft > 0) {
-          await new Promise(function(r) { setTimeout(r, 1500); });
-          return submitAnswerWithRetry(payload, attemptsLeft - 1);
-        }
-        throw err;
-      }
-    }
-
     async function doSubmit() {
       if (hasSubmitted) return;
       if (isTimeUp) { showToast('หมดเวลาแล้ว ไม่สามารถส่งได้', true); return; }
@@ -618,7 +442,7 @@
       btn.disabled = true; btn.textContent = 'กำลังส่ง...';
 
       try {
-        const res = await submitAnswerWithRetry({ ign, answer });
+        const res = await EPData.submitAnswer(ign, answer, currentConfig ? currentConfig.status : null);
         if (res && res.success) {
           hasSubmitted = true;
           saveIGN(ign);
@@ -644,151 +468,32 @@
     // ============================================================
     let revealedWinners = [];
     let isSpinningSlot = false;
-    let crowdNames = []; // ชื่อคนตอบถูกทั้งหมดที่ render เป็น grid อยู่ตอนนี้
-
-    const CHASE_STEP_DELAYS = [70, 70, 80, 90, 100, 120, 140, 170, 210, 260, 320, 400, 500, 650];
-    const CROWD_COLUMNS = 4; // ต้องตรงกับ grid-cols-4 ที่ตั้งไว้ใน HTML ของ #crowdGrid
-    const CROWD_ROW_HEIGHT = 86; // ประมาณ cell height + row-gap ไว้คำนวณตำแหน่ง auto-scroll คร่าวๆ
-
-    function normNameCompare(s) { return String(s || '').trim().toUpperCase(); }
+    // Crowd Grid + สปอตไลต์ไล่ไฮไลท์ อยู่ใน shared/crowd-grid.js (ใช้ร่วมกับหน้า admin)
 
     // ============================================================
-    // Crowd Grid — แสดงคนตอบถูกทั้งหมดเป็นไอคอนคน + ชื่อ แล้ว "สปอตไลต์" ไล่ไฮไลท์
-    // ไปเรื่อยๆ (สุ่มดูวุ่นวายเป็นเอฟเฟกต์เฉยๆ ไม่ได้เป็นตัวสุ่มจริง — server สุ่มมาแล้ว)
-    // ก่อนไปหยุดค้างที่คนซึ่ง server สุ่มได้จริง
+    // Result — เรียกทุกครั้งที่ config/winners/reveal อัปเดตตอนอยู่ในโหมด Drawing/Drawn
+    // (แทน polling tick ทุก 5 วิของเวอร์ชัน GAS — ตรรกะการตัดสินใจข้างในเหมือนเดิมทุกอย่าง)
     // ============================================================
-    function ensureCrowdGrid(names) {
-      const grid = document.getElementById('crowdGrid');
-      if (grid.childElementCount > 0) return; // สร้างแค่ครั้งแรกของรอบนี้ กันโดนรีเซ็ตสถานะ "ได้รางวัลแล้ว" ทับ
-      crowdNames = names;
-      document.getElementById('crowdCountText').textContent = 'ผู้ตอบถูกทั้งหมด (' + names.length + ' คน)';
-      names.forEach(function(name, i) {
-        const cell = document.createElement('div');
-        cell.className = 'person-cell';
-        cell.innerHTML =
-          '<div style="position: relative;">' +
-            '<div class="person-icon" id="personIcon' + i + '">' +
-              '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-                '<circle cx="12" cy="8" r="3.6"></circle>' +
-                '<path d="M4.5 20.2c1.2-4 4-6.2 7.5-6.2s6.3 2.2 7.5 6.2"></path>' +
-              '</svg>' +
-            '</div>' +
-            '<div class="rank-badge hidden" id="rankBadge' + i + '"></div>' +
-          '</div>' +
-          '<p class="person-name" id="personName' + i + '">' + escHtml(name) + '</p>';
-        grid.appendChild(cell);
-      });
-    }
+    function evaluateResult() {
+      if (!currentConfig) return;
+      showingResult = true;
+      clearInterval(countdownTimer);
 
-    function scrollCrowdToIndex(index) {
-      const scroller = document.getElementById('crowdScroll');
-      if (!scroller) return;
-      const row = Math.floor(index / CROWD_COLUMNS);
-      const target = row * CROWD_ROW_HEIGHT - (scroller.clientHeight / 2) + (CROWD_ROW_HEIGHT / 2);
-      scroller.scrollTop = Math.max(0, target);
-    }
-
-    function setHighlight(index) {
-      crowdNames.forEach(function(_, i) {
-        if (i === index) return;
-        const icon = document.getElementById('personIcon' + i);
-        if (icon && !icon.classList.contains('is-won')) icon.classList.remove('is-highlighted');
-      });
-      const icon = document.getElementById('personIcon' + index);
-      if (icon && !icon.classList.contains('is-won')) icon.classList.add('is-highlighted');
-      scrollCrowdToIndex(index);
-    }
-
-    function markWon(index, rank) {
-      const icon = document.getElementById('personIcon' + index);
-      const badge = document.getElementById('rankBadge' + index);
-      const nameEl = document.getElementById('personName' + index);
-      if (icon) {
-        icon.classList.remove('is-highlighted');
-        icon.classList.add('is-won', 'won-pop');
-      }
-      if (badge) {
-        badge.textContent = rank;
-        badge.classList.remove('hidden');
-      }
-      if (nameEl) nameEl.classList.add('is-won-name');
-    }
-
-    // ============================================================
-    // Polling — ตรวจสอบการสุ่มทุก 5 วินาที
-    // ============================================================
-    function startPolling() {
-      if (pollingTimer) clearInterval(pollingTimer);
-      pollingTimer = setInterval(async function() {
-        try {
-          const data = await gasCall('getStatus');
-          if (!data) return;
-
-          // เช็คว่าแอดมินขยายเวลาสิ้นสุดไปมั้ย ถ้าใช่และยังไม่ส่งคำตอบ/ยังไม่หมดเวลา ให้รีสตาร์ท countdown ด้วยเวลาใหม่
-          if (data.status === 'Open' && !hasSubmitted && !isTimeUp &&
-              data.endTime && currentConfig && data.endTime !== currentConfig.endTime) {
-            currentConfig.endTime = data.endTime;
-            clearInterval(countdownTimer);
-            startCountdown(data.endTime);
-          }
-
-          const serverWinners = Array.isArray(data.winners) ? data.winners : [];
-
-          // ถ้ามีการสุ่มผู้ชนะเกิดขึ้น (สถานะ Drawing หรือ Drawn หรือมีผู้ชนะในระบบ)
-          if (serverWinners.length > 0 || data.status === 'Drawn' || data.status === 'Drawing') {
-            if (serverWinners.length > revealedWinners.length && !isSpinningSlot) {
-              clearInterval(countdownTimer);
-              show('resultScreen');
-              document.getElementById('loadingScreen').classList.add('hidden');
-              document.getElementById('noActivityScreen').classList.add('hidden');
-              document.getElementById('quizScreen').classList.add('hidden');
-              document.getElementById('submittedScreen').classList.add('hidden');
-              document.getElementById('timeUpScreen').classList.add('hidden');
-
-              processNextWinnerAnimation(data);
-            } else if (data.status === 'Drawn' && serverWinners.length === revealedWinners.length) {
-              // สุ่มครบทุกรางวัลแล้ว หยุด polling
-              clearInterval(pollingTimer);
-              pollingTimer = null;
-            }
-          }
-        } catch (_) {}
-      }, 5000);
-    }
-
-    function stopPolling() {
-      if (pollingTimer) {
-        clearInterval(pollingTimer);
-        pollingTimer = null;
-      }
-    }
-
-    // หยุด Polling อัตโนมัติเมื่อพับจอ/สลับแท็บ และเริ่มใหม่เมื่อกลับมาเปิดหน้าเว็บ
-    document.addEventListener('visibilitychange', function() {
-      if (document.hidden) {
-        stopPolling();
-      } else {
-        if (currentConfig && (currentConfig.status === 'Open' || currentConfig.status === 'Drawing')) {
-          startPolling();
-        }
-      }
-    });
-
-    // ============================================================
-    // Result — Slot Animation ทีละคน
-    // ============================================================
-    async function showResultScreen(data) {
-      hideAll();
-      show('resultScreen');
-
-      if (!data) {
-        try {
-          data = await gasCall('getStatus');
-        } catch (err) { return; }
+      if (document.getElementById('resultScreen').classList.contains('hidden')) {
+        hideAll();
+        show('resultScreen');
       }
 
-      const serverWinners = Array.isArray(data.winners) ? data.winners : [];
-      if (serverWinners.length > 0) {
+      const data = {
+        status:             currentConfig.status,
+        endTime:            currentConfig.endTime,
+        prizeCount:         currentConfig.prizeCount,
+        winners:            latestWinners,
+        totalCorrect:       latestReveal.totalCorrect,
+        correctRespondents: latestReveal.correctRespondentIGNs
+      };
+
+      if (latestWinners.length > revealedWinners.length && !isSpinningSlot) {
         processNextWinnerAnimation(data);
       }
     }
@@ -822,61 +527,40 @@
 
       ensureCrowdGrid(allCorrectNames.length > 0 ? allCorrectNames : ['...']);
 
-      let targetIndex = crowdNames.findIndex(function(nm) { return normNameCompare(nm) === normNameCompare(nextWinnerName); });
+      let targetIndex = findCrowdIndex(nextWinnerName);
       if (targetIndex === -1) targetIndex = 0;
 
-      const alreadyWonNormalized = revealedWinners.map(function(nm) { return normNameCompare(nm); });
-      const eligible = crowdNames
-        .map(function(_, i) { return i; })
-        .filter(function(i) { return alreadyWonNormalized.indexOf(normNameCompare(crowdNames[i])) === -1; });
-      if (eligible.length === 0) eligible.push(targetIndex);
+      runCrowdChase(targetIndex, revealedWinners, function() {
+        // บันทึกว่าแสดงคนนี้แล้ว
+        markWon(targetIndex, rank);
+        revealedWinners.push(nextWinnerName);
 
-      let step = 0;
-      function runStep() {
-        const isLastStep = step >= CHASE_STEP_DELAYS.length - 1;
-        const idx = isLastStep ? targetIndex : eligible[Math.floor(Math.random() * eligible.length)];
-        setHighlight(idx);
+        // เพิ่มการ์ดผู้ชนะ
+        const card = document.createElement('div');
+        card.className = 'winner-card glass gold-border rounded-xl p-4 fade-in';
+        card.innerHTML =
+          '<div class="flex items-center justify-between mb-1">' +
+            '<span class="eyebrow">รางวัลที่ ' + rank + '</span>' +
+            '<span class="text-[10px] text-gold-dim">จาก ' + totalPrizes + ' รางวัล</span>' +
+          '</div>' +
+          '<p class="font-display text-xl font-semibold gold-text">' + escHtml(nextWinnerName) + '</p>';
+        winnersList.appendChild(card);
 
-        const delay = CHASE_STEP_DELAYS[step];
-        if (!isLastStep) {
-          step++;
-          setTimeout(runStep, delay);
-          return;
-        }
+        prizeBadge.textContent = revealedWinners.length + ' / ' + totalPrizes + ' รางวัล';
+        launchConfetti();
 
         setTimeout(function() {
-          // บันทึกว่าแสดงคนนี้แล้ว
-          markWon(targetIndex, rank);
-          revealedWinners.push(nextWinnerName);
-
-          // เพิ่มการ์ดผู้ชนะ
-          const card = document.createElement('div');
-          card.className = 'winner-card glass gold-border rounded-xl p-4 fade-in';
-          card.innerHTML =
-            '<div class="flex items-center justify-between mb-1">' +
-              '<span class="eyebrow">รางวัลที่ ' + rank + '</span>' +
-              '<span class="text-[10px] text-gold-dim">จาก ' + totalPrizes + ' รางวัล</span>' +
-            '</div>' +
-            '<p class="font-display text-xl font-semibold gold-text">' + escHtml(nextWinnerName) + '</p>';
-          winnersList.appendChild(card);
-
-          prizeBadge.textContent = revealedWinners.length + ' / ' + totalPrizes + ' รางวัล';
-          launchConfetti();
-
-          setTimeout(function() {
-            isSpinningSlot = false;
-            // ถ้ายังมีคนที่ต้อง animate ต่อ
-            if (revealedWinners.length < serverWinners.length) {
-              processNextWinnerAnimation(data);
-            } else if (data.status === 'Drawn' || revealedWinners.length >= totalPrizes) {
-              display.textContent = 'สุ่มครบทุกรางวัลแล้ว';
-            } else {
-              display.textContent = 'รอแอดมินสุ่มรางวัลถัดไป';
-            }
-          }, 1200);
-        }, delay);
-      }
-      runStep();
+          isSpinningSlot = false;
+          // ถ้ายังมีคนที่ต้อง animate ต่อ
+          if (revealedWinners.length < serverWinners.length) {
+            processNextWinnerAnimation(data);
+          } else if (data.status === 'Drawn' || revealedWinners.length >= totalPrizes) {
+            display.textContent = 'สุ่มครบทุกรางวัลแล้ว';
+          } else {
+            display.textContent = 'รอแอดมินสุ่มรางวัลถัดไป';
+          }
+        }, 1200);
+      });
     }
 
     // ============================================================
