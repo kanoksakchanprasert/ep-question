@@ -100,9 +100,12 @@
               <span class="text-[11px] text-gold">คลิกเลือกวัน/เวลา</span>
             </label>
             <input id="cfgEndTime" type="datetime-local" onclick="try{this.showPicker()}catch(e){}" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm" />
-            <button onclick="doExtendEndTime()" id="btnExtendTime" class="btn-outline w-full py-2 rounded-xl font-medium text-xs mt-2">ขยายเวลานี้ให้รอบปัจจุบัน (ไม่ล้างคำตอบเดิม)</button>
           </div>
-          <button onclick="doSaveConfig()" id="btnSave" class="btn-gold w-full py-3 rounded-xl font-medium text-sm mt-2">บันทึก &amp; เปิดกิจกรรม</button>
+          <div class="grid grid-cols-2 gap-3 mt-2">
+            <button onclick="doUpdateConfig()" id="btnUpdate" class="btn-outline py-3 rounded-xl font-medium text-sm">Update</button>
+            <button onclick="doSaveConfig()" id="btnSave" class="btn-gold py-3 rounded-xl font-medium text-sm">เปิดรับคำตอบ</button>
+          </div>
+          <p class="text-[11px] text-gold-dim text-center">Update = แก้ข้อมูลรอบที่เปิดอยู่ (ไม่ล้างคำตอบ) · เปิดรับคำตอบ = เริ่มรอบใหม่</p>
         </div>
       </div>
 
@@ -306,7 +309,7 @@
 
       const formElements = [
         'cfgQuestion', 'cfgOptA', 'cfgOptB', 'cfgOptC', 'cfgOptD',
-        'cfgCorrect', 'cfgPrize', 'cfgEndTime', 'btnSave', 'btnExtendTime',
+        'cfgCorrect', 'cfgPrize', 'cfgEndTime',
         'btnFetch', 'btnDrawNext', 'btnDrawAll', 'btnResetWinners'
       ];
       formElements.forEach(function(id) {
@@ -337,6 +340,17 @@
       const info = map[status] || { text: 'ยังไม่มีกิจกรรม', color: 'var(--ink-faint)' };
       el.innerHTML = '<span class="inline-block w-1.5 h-1.5 rounded-full mr-1.5" style="background:' + info.color + '"></span>' + info.text;
       updateDeadlineBanner();
+      updateSetupButtons();
+    }
+
+    // Update: กดได้เฉพาะตอน Open | เปิดรับคำตอบ: กดได้ตอนเริ่มต้น (NoData) หรือกำลังสุ่ม (Drawing)
+    // (Open = เปิดอยู่แล้ว, Drawn = สิ้นสุดแล้ว) | รีเซ็ต: กดได้ตลอด
+    function updateSetupButtons() {
+      const btnUpdate = document.getElementById('btnUpdate');
+      const btnSave = document.getElementById('btnSave');
+      if (!btnUpdate || !btnSave) return;
+      btnUpdate.disabled = isUpdatingConfig || isSavingConfig || adminActivityStatus !== 'Open';
+      btnSave.disabled = isUpdatingConfig || isSavingConfig || !(adminActivityStatus === 'NoData' || adminActivityStatus === 'Drawing');
     }
 
     // ============================================================
@@ -457,24 +471,15 @@
     }
 
     // ============================================================
-    // บันทึกตั้งค่า & เปิดกิจกรรมรอบใหม่
+    // อ่าน + ตรวจฟอร์มตั้งค่า (ใช้ร่วมกันระหว่าง เปิดรับคำตอบ / Update)
+    // คืน null ถ้าข้อมูลไม่ครบ (แสดง toast ให้แล้ว)
     // ============================================================
-    let isSavingConfig = false;
-
-    async function doSaveConfig() {
-      if (isSavingConfig) return;
-
+    function readConfigForm() {
       const q = document.getElementById('cfgQuestion').value.trim();
-      if (!q) { showToast('กรุณากรอกคำถาม', true); return; }
-
-      const prizeCountVal = parseInt(document.getElementById('cfgPrize').value) || 1;
+      if (!q) { showToast('กรุณากรอกคำถาม', true); return null; }
 
       const endTimeRaw = document.getElementById('cfgEndTime').value;
-      if (!endTimeRaw) { showToast('กรุณาตั้งเวลาสิ้นสุด', true); return; }
-
-      // แปลงเป็น UTC ISO string ที่ชัดเจนก่อนส่ง — ป้องกันการตีความ timezone ของ string
-      // เปล่าๆ (ไม่มี zone info) ผิดไปจาก timezone ที่แอดมินตั้งใจเลือกจริง
-      const endTimeISO = new Date(endTimeRaw).toISOString();
+      if (!endTimeRaw) { showToast('กรุณาตั้งเวลาสิ้นสุด', true); return null; }
 
       const data = {
         question:      q,
@@ -483,81 +488,104 @@
         optionC:       document.getElementById('cfgOptC').value.trim(),
         optionD:       document.getElementById('cfgOptD').value.trim(),
         correctAnswer: document.getElementById('cfgCorrect').value,
-        prizeCount:    prizeCountVal,
-        endTime:       endTimeISO
+        prizeCount:    parseInt(document.getElementById('cfgPrize').value) || 1,
+        // แปลงเป็น UTC ISO string ที่ชัดเจนก่อนส่ง — ป้องกันการตีความ timezone ของ string
+        // เปล่าๆ (ไม่มี zone info) ผิดไปจาก timezone ที่แอดมินตั้งใจเลือกจริง
+        endTime:       new Date(endTimeRaw).toISOString()
       };
-      if (!data.optionA || !data.optionB) { showToast('กรุณากรอกตัวเลือกอย่างน้อย 2 ข้อ', true); return; }
+      if (!data.optionA || !data.optionB) { showToast('กรุณากรอกตัวเลือกอย่างน้อย 2 ข้อ', true); return null; }
+      return data;
+    }
+
+    // ============================================================
+    // เปิดรับคำตอบ (เปิดกิจกรรมรอบใหม่ — archive รอบเก่าและล้างคำตอบ/ผู้ชนะ)
+    // กดได้เมื่อสถานะเป็นเริ่มต้น (NoData) หรือกำลังสุ่มรางวัล (Drawing)
+    // ============================================================
+    let isSavingConfig = false;
+
+    async function doSaveConfig() {
+      if (isSavingConfig || isUpdatingConfig) return;
+      if (adminActivityStatus !== 'NoData' && adminActivityStatus !== 'Drawing') return;
+
+      const data = readConfigForm();
+      if (!data) return;
+
+      if (adminActivityStatus === 'Drawing' &&
+          !(await showConfirm('กำลังสุ่มรางวัลอยู่ — เปิดรับคำตอบใหม่จะสำรองรอบนี้เข้า History แล้วล้างคำตอบ/ผู้ชนะทั้งหมด ยืนยันหรือไม่?'))) return;
 
       isSavingConfig = true;
+      updateSetupButtons();
       const btn = document.getElementById('btnSave');
-      btn.disabled = true;
-      btn.innerHTML = '<span class="inline-block w-3.5 h-3.5 border-2 border-t-transparent rounded-full animate-spin align-[-2px] mr-2" style="border-color: var(--on-accent); border-top-color: transparent;"></span>กำลังบันทึก...';
+      btn.innerHTML = '<span class="inline-block w-3.5 h-3.5 border-2 border-t-transparent rounded-full animate-spin align-[-2px] mr-2" style="border-color: var(--on-accent); border-top-color: transparent;"></span>กำลังเปิด...';
 
       try {
         const res = await EPAdmin.saveConfig(data);
         if (res && res.success) {
-          showToast(res.message || 'บันทึกสำเร็จ — กิจกรรมเปิดแล้ว');
-          adminEndTime = endTimeISO;
-          updateStatusBadge('Open');
+          showToast(res.message || 'เปิดรับคำตอบแล้ว');
+          adminEndTime = data.endTime;
 
           // รีเซ็ตสถานะการสุ่มสำหรับรอบใหม่ทันที (ก่อน watcher จะยืนยันตามมา)
           adminWinners = [];
-          adminPrizeCount = prizeCountVal;
+          adminPrizeCount = data.prizeCount;
           adminCorrectList = [];
           adminTotalCorrect = null;
           renderWinnersList();
+          updateDrawControls();
 
           clearAdminCrowd();
           document.getElementById('drawResultContainer').classList.add('hidden');
           document.getElementById('allListContainer').classList.add('hidden');
+          updateStatusBadge('Open');
         } else {
-          showToast((res && (res.message || res.error)) || 'เกิดข้อผิดพลาดในการบันทึก', true);
+          showToast((res && (res.message || res.error)) || 'เกิดข้อผิดพลาดในการเปิดรับคำตอบ', true);
         }
       } catch (err) {
         showToast(err.message || err, true);
       } finally {
         isSavingConfig = false;
-        btn.disabled = false; btn.textContent = 'บันทึก & เปิดกิจกรรม';
+        btn.textContent = 'เปิดรับคำตอบ';
+        updateSetupButtons();
       }
     }
 
     // ============================================================
-    // ขยาย/ปรับเวลาสิ้นสุดของรอบปัจจุบัน โดยไม่ล้างคำตอบ/ผู้ชนะเดิม
-    // (ต่างจากบันทึก & เปิดกิจกรรม ที่จะ archive รอบเก่าและล้างข้อมูลทั้งหมด)
+    // Update — อัปเดตข้อมูลทุกอย่างในแท็บตั้งค่าของรอบปัจจุบัน โดยไม่ reset
+    // (ไม่ล้างคำตอบ/ผู้ชนะ ไม่เปลี่ยนสถานะ) กดได้เฉพาะตอน Open
     // ============================================================
-    let isExtendingTime = false;
+    let isUpdatingConfig = false;
 
-    async function doExtendEndTime() {
-      if (isExtendingTime) return;
-
-      const endTimeRaw = document.getElementById('cfgEndTime').value;
-      if (!endTimeRaw) { showToast('กรุณาเลือกเวลาสิ้นสุดใหม่ก่อน', true); return; }
-
+    async function doUpdateConfig() {
+      if (isUpdatingConfig || isSavingConfig) return;
       if (adminActivityStatus !== 'Open') {
-        showToast('ขยายเวลาได้เฉพาะตอนกิจกรรมยังเปิดรับคำตอบอยู่เท่านั้น', true);
+        showToast('Update ได้เฉพาะตอนกิจกรรมเปิดรับคำตอบอยู่เท่านั้น', true);
         return;
       }
 
-      const endTimeISO = new Date(endTimeRaw).toISOString();
+      const data = readConfigForm();
+      if (!data) return;
 
-      isExtendingTime = true;
-      const btn = document.getElementById('btnExtendTime');
-      btn.disabled = true; btn.textContent = 'กำลังขยายเวลา...';
+      isUpdatingConfig = true;
+      updateSetupButtons();
+      const btn = document.getElementById('btnUpdate');
+      btn.textContent = 'กำลังอัปเดต...';
 
       try {
-        const res = await EPAdmin.extendEndTime(endTimeISO);
+        const res = await EPAdmin.updateConfig(data);
         if (res && res.success) {
-          showToast(res.message || 'ขยายเวลาสิ้นสุดเรียบร้อย');
-          adminEndTime = endTimeISO;
+          showToast(res.message || 'อัปเดตข้อมูลกิจกรรมเรียบร้อย');
+          adminEndTime = data.endTime;
+          adminPrizeCount = data.prizeCount;
           updateDeadlineBanner();
+          updateDrawControls();
         } else {
-          showToast((res && (res.message || res.error)) || 'ขยายเวลาไม่สำเร็จ', true);
+          showToast((res && (res.message || res.error)) || 'อัปเดตไม่สำเร็จ', true);
         }
       } catch (err) {
         showToast(err.message || err, true);
       } finally {
-        isExtendingTime = false;
-        btn.disabled = false; btn.textContent = 'ขยายเวลานี้ให้รอบปัจจุบัน (ไม่ล้างคำตอบเดิม)';
+        isUpdatingConfig = false;
+        btn.textContent = 'Update';
+        updateSetupButtons();
       }
     }
 
