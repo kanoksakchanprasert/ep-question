@@ -175,23 +175,39 @@ const EPAdmin = (function () {
   }
 
   // ============================================================
-  // ขยาย/ปรับเวลาสิ้นสุดของรอบที่กำลังเปิดอยู่ โดยไม่ล้างคำตอบ/ผู้ชนะเดิม
+  // อัปเดตข้อมูลตั้งค่าทั้งหมดของรอบที่กำลังเปิดอยู่ (คำถาม/ตัวเลือก/เฉลย/จำนวนรางวัล/เวลาสิ้นสุด)
+  // โดยไม่ archive ไม่ล้างคำตอบ/ผู้ชนะ และไม่แตะสถานะ — ใช้ transaction เช็ค status == Open
+  // กับการเขียนในก้อนเดียว กันช่วงที่สถานะเปลี่ยนเป็น Drawing ระหว่างเช็คกับเขียน
   // ============================================================
-  async function extendEndTime(newEndTime) {
-    const configSnap = await STATE.doc('config').get();
-    const config = configSnap.exists ? configSnap.data() : { status: 'NoData' };
-
-    if (config.status !== 'Open') {
-      return { success: false, message: 'ขยายเวลาได้เฉพาะตอนกิจกรรมยังเปิดรับคำตอบอยู่ (Open) เท่านั้น' };
+  async function updateConfig(data) {
+    const endTime = String((data && data.endTime) || '').trim();
+    if (!data || !String(data.question || '').trim() || !endTime) {
+      return { success: false, message: 'กรุณากรอกคำถามและเวลาสิ้นสุดให้ครบ' };
     }
 
-    newEndTime = String(newEndTime || '').trim();
-    if (!newEndTime) {
-      return { success: false, message: 'กรุณาระบุเวลาสิ้นสุดใหม่' };
-    }
+    const configRef = STATE.doc('config');
+    const notOpen = await db.runTransaction(async function (tx) {
+      const snap = await tx.get(configRef);
+      const status = snap.exists ? snap.data().status : 'NoData';
+      if (status !== 'Open') return true;
 
-    await STATE.doc('config').update({ endTime: newEndTime });
-    return { success: true, message: 'ขยายเวลาสิ้นสุดเรียบร้อย', endTime: newEndTime };
+      tx.update(configRef, {
+        question:   data.question,
+        optionA:    data.optionA,
+        optionB:    data.optionB,
+        optionC:    data.optionC,
+        optionD:    data.optionD,
+        prizeCount: parseInt(data.prizeCount) || 1,
+        endTime:    endTime
+      });
+      tx.set(STATE.doc('secureAnswer'), { correctAnswer: data.correctAnswer });
+      return false;
+    });
+
+    if (notOpen) {
+      return { success: false, message: 'อัปเดตได้เฉพาะตอนกิจกรรมยังเปิดรับคำตอบอยู่ (Open) เท่านั้น' };
+    }
+    return { success: true, message: 'อัปเดตข้อมูลกิจกรรมเรียบร้อย', endTime: endTime };
   }
 
   // ============================================================
@@ -400,7 +416,7 @@ const EPAdmin = (function () {
     onAuthChange: onAuthChange,
     getAdminConfig: getAdminConfig,
     saveConfig: saveConfig,
-    extendEndTime: extendEndTime,
+    updateConfig: updateConfig,
     getCorrectRespondents: getCorrectRespondents,
     getAllRespondents: getAllRespondents,
     drawNextWinner: drawNextWinner,
