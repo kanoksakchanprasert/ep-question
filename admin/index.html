@@ -105,13 +105,13 @@
             <button onclick="doUpdateConfig()" id="btnUpdate" class="btn-outline py-3 rounded-xl font-medium text-sm">Update</button>
             <button onclick="doSaveConfig()" id="btnSave" class="btn-gold py-3 rounded-xl font-medium text-sm">เปิดรับคำตอบ</button>
           </div>
-          <p class="text-[11px] text-gold-dim text-center">Update = แก้ข้อมูลรอบที่เปิดอยู่ (ไม่ล้างคำตอบ) · เปิดรับคำตอบ = เริ่มรอบใหม่</p>
+          <p id="setupHint" class="text-[11px] text-gold-dim text-center"></p>
         </div>
       </div>
 
       <!-- Reset -->
       <div class="text-center fade-in mb-4">
-        <button onclick="doReset()" class="btn-danger px-6 py-2.5 rounded-xl font-medium text-xs">รีเซ็ตกิจกรรม</button>
+        <button onclick="doReset()" id="btnReset" class="btn-danger px-6 py-2.5 rounded-xl font-medium text-xs">รีเซ็ตกิจกรรม</button>
       </div>
       </div>
       <!-- ========== /TAB: ตั้งค่า ========== -->
@@ -201,10 +201,10 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
   <script src="../firebase-config.js"></script>
-  <script src="../shared/firebase-init.js"></script>
-  <script src="../shared/data.js"></script>
-  <script src="../shared/admin-data.js"></script>
-  <script src="../shared/crowd-grid.js"></script>
+  <script src="../shared/firebase-init.js?v=2"></script>
+  <script src="../shared/data.js?v=2"></script>
+  <script src="../shared/admin-data.js?v=2"></script>
+  <script src="../shared/crowd-grid.js?v=2"></script>
 
   <script>
     // ============================================================
@@ -290,6 +290,7 @@
     // ============================================================
     let adminWinners = [];
     let adminPrizeCount = 1;
+    let adminCorrectAnswer = ''; // เฉลยที่บันทึกอยู่ในระบบตอนนี้ — ไว้เตือนตอน Update เปลี่ยนเฉลยกลางรอบ
     let adminCorrectList = [];
     let adminTotalCorrect = null;
     let adminShownWinners = ''; // ผู้ชนะที่ grid วางสถานะไว้แล้ว (ไว้เทียบกับที่ watcher ส่งมา จะได้ไม่วาด grid ทับโดยไม่จำเป็น)
@@ -323,6 +324,7 @@
           }
         }
       });
+      if (!isLoading) updateSetupButtons();
     }
 
     // ============================================================
@@ -341,6 +343,7 @@
       el.innerHTML = '<span class="inline-block w-1.5 h-1.5 rounded-full mr-1.5" style="background:' + info.color + '"></span>' + info.text;
       updateDeadlineBanner();
       updateSetupButtons();
+      updateDrawControls();
     }
 
     // Update: กดได้เฉพาะตอน Open | เปิดรับคำตอบ: กดได้ตอนเริ่มต้น (NoData) หรือกำลังสุ่ม (Drawing)
@@ -349,9 +352,28 @@
       const btnUpdate = document.getElementById('btnUpdate');
       const btnSave = document.getElementById('btnSave');
       if (!btnUpdate || !btnSave) return;
-      btnUpdate.disabled = isUpdatingConfig || isSavingConfig || adminActivityStatus !== 'Open';
-      btnSave.disabled = isUpdatingConfig || isSavingConfig || !(adminActivityStatus === 'NoData' || adminActivityStatus === 'Drawing');
+      const busy = isUpdatingConfig || isSavingConfig;
+      const canUpdate = adminActivityStatus === 'Open';
+      const canOpen = adminActivityStatus === 'NoData' || adminActivityStatus === 'Drawing';
+      btnUpdate.disabled = busy || !canUpdate;
+      btnSave.disabled = busy || !canOpen;
+
+      // ฟอร์มแก้ได้เฉพาะตอนที่มีปุ่มให้บันทึกจริง (สุ่มเสร็จแล้ว/กำลังซิงค์ = อ่านอย่างเดียว)
+      CONFIG_INPUT_IDS.forEach(function(id) {
+        document.getElementById(id).disabled = busy || !(canUpdate || canOpen);
+      });
+
+      document.getElementById('setupHint').textContent = SETUP_HINTS[adminActivityStatus] || '';
     }
+
+    const CONFIG_INPUT_IDS = ['cfgQuestion', 'cfgOptA', 'cfgOptB', 'cfgOptC', 'cfgOptD', 'cfgCorrect', 'cfgPrize', 'cfgEndTime'];
+    const SETUP_HINTS = {
+      Loading: 'กำลังซิงค์ข้อมูล...',
+      NoData:  'กรอกข้อมูลแล้วกด "เปิดรับคำตอบ" เพื่อเริ่มกิจกรรม',
+      Open:    'กำลังเปิดรับคำตอบ — แก้ข้อมูลแล้วกด "Update" ได้ (คำตอบเดิมไม่หาย)',
+      Drawing: 'กำลังสุ่มรางวัล — กด "เปิดรับคำตอบ" เพื่อเริ่มรอบใหม่ (รอบนี้จะถูกสำรองแล้วล้าง)',
+      Drawn:   'สุ่มรางวัลเสร็จแล้ว — กด "รีเซ็ตกิจกรรม" เพื่อเริ่มรอบใหม่'
+    };
 
     // ============================================================
     // แจ้งเตือนเมื่อเลยเวลาสิ้นสุดรับคำตอบแล้ว (Open ค้างไว้เฉยๆ)
@@ -444,6 +466,7 @@
       document.getElementById('cfgOptB').value = cfg.optionB || '';
       document.getElementById('cfgOptC').value = cfg.optionC || '';
       document.getElementById('cfgOptD').value = cfg.optionD || '';
+      adminCorrectAnswer = cfg.correctAnswer || '';
       document.getElementById('cfgCorrect').value = cfg.correctAnswer || 'A';
       document.getElementById('cfgPrize').value = adminPrizeCount;
 
@@ -480,6 +503,7 @@
 
       const endTimeRaw = document.getElementById('cfgEndTime').value;
       if (!endTimeRaw) { showToast('กรุณาตั้งเวลาสิ้นสุด', true); return null; }
+      if (new Date(endTimeRaw).getTime() <= Date.now()) { showToast('เวลาสิ้นสุดต้องเป็นเวลาในอนาคต', true); return null; }
 
       const data = {
         question:      q,
@@ -523,6 +547,7 @@
         if (res && res.success) {
           showToast(res.message || 'เปิดรับคำตอบแล้ว');
           adminEndTime = data.endTime;
+          adminCorrectAnswer = data.correctAnswer;
 
           // รีเซ็ตสถานะการสุ่มสำหรับรอบใหม่ทันที (ก่อน watcher จะยืนยันตามมา)
           adminWinners = [];
@@ -553,6 +578,7 @@
     // (ไม่ล้างคำตอบ/ผู้ชนะ ไม่เปลี่ยนสถานะ) กดได้เฉพาะตอน Open
     // ============================================================
     let isUpdatingConfig = false;
+    const THAI_OPT = { A: 'ก', B: 'ข', C: 'ค', D: 'ง' };
 
     async function doUpdateConfig() {
       if (isUpdatingConfig || isSavingConfig) return;
@@ -564,6 +590,14 @@
       const data = readConfigForm();
       if (!data) return;
 
+      if (adminCorrectAnswer && data.correctAnswer !== adminCorrectAnswer) {
+        let answered = 0;
+        try { answered = (await EPAdmin.getAllRespondents()).length; } catch (_) {}
+        if (answered > 0 &&
+            !(await showConfirm('กำลังเปลี่ยนเฉลยจากข้อ ' + THAI_OPT[adminCorrectAnswer] + ' เป็นข้อ ' + THAI_OPT[data.correctAnswer] +
+              ' ขณะที่มีคนตอบแล้ว ' + answered + ' คน — รายชื่อคนตอบถูกจะเปลี่ยนตามเฉลยใหม่ทันที ยืนยันหรือไม่?'))) return;
+      }
+
       isUpdatingConfig = true;
       updateSetupButtons();
       const btn = document.getElementById('btnUpdate');
@@ -574,6 +608,11 @@
         if (res && res.success) {
           showToast(res.message || 'อัปเดตข้อมูลกิจกรรมเรียบร้อย');
           adminEndTime = data.endTime;
+          adminCorrectAnswer = data.correctAnswer;
+          // เฉลยอาจเปลี่ยน — รายชื่อคนตอบถูกที่ดึงไว้เดิมใช้ไม่ได้แล้ว
+          adminCorrectList = [];
+          adminTotalCorrect = null;
+          clearAdminCrowd();
           adminPrizeCount = data.prizeCount;
           updateDeadlineBanner();
           updateDrawControls();
@@ -643,8 +682,18 @@
 
       const btnNext = document.getElementById('btnDrawNext');
       const btnAll = document.getElementById('btnDrawAll');
+      const noActivity = adminActivityStatus === 'NoData' || adminActivityStatus === 'Loading';
 
-      if (isComplete) {
+      document.getElementById('btnResetWinners').disabled = drawnCount === 0;
+      document.getElementById('btnFetch').disabled = noActivity;
+
+      if (noActivity) {
+        btnNext.disabled = true;
+        btnNext.textContent = adminActivityStatus === 'Loading' ? 'กำลังซิงค์...' : 'ยังไม่มีกิจกรรม';
+        btnNext.className = 'w-full py-3.5 rounded-xl font-semibold text-sm cursor-not-allowed glass-card text-gold-dim';
+        btnAll.disabled = true;
+        btnAll.classList.add('opacity-40', 'cursor-not-allowed');
+      } else if (isComplete) {
         btnNext.disabled = true;
         btnNext.textContent = drawnCount >= total
           ? 'สุ่มครบ ' + total + ' รางวัลแล้ว'
@@ -862,10 +911,21 @@
     // ============================================================
     // Reset กิจกรรมทั้งหมด (เคลียร์ทั้ง Firestore และฟอร์มหน้าจอ)
     // ============================================================
+    let isResetting = false;
+
     async function doReset() {
+      if (isResetting) return;
       if (!(await showConfirm('ยืนยันรีเซ็ตกิจกรรมทั้งหมด? (ระบบจะสำรองข้อมูลรอบปัจจุบันเข้า History แล้วล้างคำถาม/คำตอบออก)'))) return;
+
+      isResetting = true;
+      const btn = document.getElementById('btnReset');
+      btn.disabled = true; btn.textContent = 'กำลังรีเซ็ต...';
       try {
         const res = await EPAdmin.resetActivity();
+        if (res && res.success === false) {
+          showToast(res.message || 'รีเซ็ตไม่สำเร็จ', true);
+          return;
+        }
         showToast((res && res.message) || 'รีเซ็ตกิจกรรมเรียบร้อย');
         updateStatusBadge('NoData');
 
@@ -878,6 +938,7 @@
         adminCorrectList = [];
         adminTotalCorrect = null;
         adminEndTime = null;
+        adminCorrectAnswer = '';
         renderWinnersList();
 
         clearAdminCrowd();
@@ -885,6 +946,9 @@
         document.getElementById('allListContainer').classList.add('hidden');
       } catch (err) {
         showToast(err.message || err, true);
+      } finally {
+        isResetting = false;
+        btn.disabled = false; btn.textContent = 'รีเซ็ตกิจกรรม';
       }
     }
 
