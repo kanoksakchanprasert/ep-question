@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>๐EP๐ GVG Admin</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="../shared/theme.css" />
+  <link rel="stylesheet" href="../shared/theme.css?v=3" />
 </head>
 <body>
 
@@ -65,6 +65,7 @@
           <button class="tab-btn active flex-1 py-2 rounded-lg text-xs font-medium" data-tab="tabSetup" onclick="switchTab('tabSetup')">ตั้งค่า</button>
           <button class="tab-btn flex-1 py-2 rounded-lg text-xs font-medium" data-tab="tabDraw" onclick="switchTab('tabDraw')">สุ่มรางวัล</button>
           <button class="tab-btn flex-1 py-2 rounded-lg text-xs font-medium" data-tab="tabData" onclick="switchTab('tabData')">ข้อมูล</button>
+          <button class="tab-btn flex-1 py-2 rounded-lg text-xs font-medium" data-tab="tabStats" onclick="switchTab('tabStats')">สถิติ</button>
         </div>
       </div>
 
@@ -176,6 +177,82 @@
       </div>
       <!-- ========== /TAB: ข้อมูล ========== -->
 
+      <!-- ========== TAB: สถิติ ========== -->
+      <div id="tabStats" class="hidden">
+        <div class="flex items-center gap-1.5 flex-wrap mb-1">
+          <button class="st-chip on" data-range="all" onclick="setStatsRange('all')">ทั้งหมด</button>
+          <button class="st-chip" data-range="30" onclick="setStatsRange('30')">30 วัน</button>
+          <button class="st-chip" data-range="7" onclick="setStatsRange('7')">7 วัน</button>
+          <span class="flex-1"></span>
+          <button id="btnStatsRefresh" onclick="loadStats()" class="btn-outline px-3 py-1.5 rounded-lg text-xs font-medium inline-flex items-center gap-1.5">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+            รีเฟรช
+          </button>
+        </div>
+        <p id="statsUpdated" class="st-muted mb-3"></p>
+
+        <div id="statsLoading" class="hidden glass gold-border rounded-xl p-3 mb-4 flex items-center justify-center gap-2.5 text-xs text-gold">
+          <span class="inline-block w-3.5 h-3.5 border-2 border-t-transparent rounded-full animate-spin" style="border-color: var(--gold); border-top-color: transparent;"></span>
+          <span class="font-medium">กำลังโหลดสถิติ...</span>
+        </div>
+
+        <div id="statsEmpty" class="hidden glass-card rounded-xl p-6 mb-4 text-center text-xs text-gold-dim">
+          ยังไม่มีข้อมูลรอบที่เล่น — สถิติจะขึ้นหลังมีคนส่งคำตอบรอบแรก
+        </div>
+
+        <div id="statsBody" class="hidden space-y-3.5">
+          <!-- KPI -->
+          <div class="grid grid-cols-2 gap-2.5">
+            <div class="glass-card st-kpi rounded-xl px-4 py-3.5 flex flex-col gap-1"><p class="eyebrow">เล่นไปแล้ว</p><div class="v st-num" id="kRounds"></div><div class="st-muted" id="kRoundsSub"></div></div>
+            <div class="glass-card st-kpi hero rounded-xl px-4 py-3.5 flex flex-col gap-1"><p class="eyebrow">แจกรางวัลไป</p><div class="v st-num" id="kPrizes"></div><div class="st-muted" id="kPrizesSub"></div></div>
+            <div class="glass-card st-kpi rounded-xl px-4 py-3.5 flex flex-col gap-1"><p class="eyebrow">ผู้เล่นทั้งหมด</p><div class="v st-num" id="kPlayers"></div><div class="st-muted" id="kPlayersSub"></div></div>
+            <div class="glass-card st-kpi rounded-xl px-4 py-3.5 flex flex-col gap-1"><p class="eyebrow">ตอบถูกเฉลี่ย</p><div class="v st-num" id="kRate"></div><div class="st-muted" id="kRateSub"></div></div>
+          </div>
+
+          <!-- กราฟผู้ร่วมเล่นต่อรอบ -->
+          <div class="glass-card rounded-2xl p-5 flex flex-col gap-3.5">
+            <div class="flex items-baseline justify-between gap-2">
+              <p class="eyebrow">ผู้ร่วมเล่นต่อรอบ</p>
+              <div class="st-legend"><span><i class="st-sw" style="background:var(--sage)"></i>ตอบถูก</span><span><i class="st-sw" style="background:rgba(177,69,60,0.55)"></i>ตอบผิด</span></div>
+            </div>
+            <div class="st-chart" id="statsChartBox"><svg id="statsChart" role="img" aria-label="จำนวนผู้ตอบถูกและผิดในแต่ละรอบ"></svg><div class="st-tip hidden" id="statsTip"></div></div>
+          </div>
+
+          <!-- ได้รางวัลมากที่สุด -->
+          <div class="glass-card gold-border rounded-2xl p-5 flex flex-col gap-3.5">
+            <div class="flex items-baseline justify-between gap-2"><p class="eyebrow">ได้รางวัลมากที่สุด</p><span class="st-muted">เสมอกัน เรียงตาม % ตอบถูก</span></div>
+            <div id="statsLbEmpty" class="hidden text-xs text-gold-dim text-center py-2">ยังไม่มีใครได้รางวัล</div>
+            <div class="st-podium" id="statsPodium"></div>
+            <ol class="st-ranks" id="statsRanks"></ol>
+          </div>
+
+          <!-- สถิติรายคน -->
+          <div class="glass-card rounded-2xl p-5 flex flex-col gap-3">
+            <div class="flex items-baseline justify-between gap-2"><p class="eyebrow">สถิติรายคน</p><span class="st-muted" id="statsPlSub"></span></div>
+            <input id="statsSearch" type="search" oninput="renderStatsPlayers()" class="input-dark w-full px-4 py-2.5 rounded-xl text-sm" placeholder="ค้นหาชื่อตัวละคร..." autocomplete="off" />
+            <div class="st-thead">
+              <button data-sort="ign" onclick="setStatsSort('ign')">ชื่อ</button>
+              <button data-sort="answered" onclick="setStatsSort('answered')" style="justify-self:center">ตอบ</button>
+              <button data-sort="rate" onclick="setStatsSort('rate')">ถูก / ผิด</button>
+              <button data-sort="prizes" onclick="setStatsSort('prizes')" style="justify-self:end">รางวัล</button>
+            </div>
+            <div class="st-rows" id="statsRows"></div>
+          </div>
+
+          <!-- ประวัติแต่ละรอบ -->
+          <div class="glass-card rounded-2xl p-5 flex flex-col gap-3">
+            <div class="flex items-baseline justify-between gap-2"><p class="eyebrow">ประวัติแต่ละรอบ</p><span class="st-muted">ล่าสุดอยู่บน</span></div>
+            <div class="st-rounds" id="statsRounds"></div>
+          </div>
+
+          <p class="st-muted text-center leading-relaxed pt-1">
+            นับจากรอบที่สำรองไว้ใน History รวมกับรอบปัจจุบัน<br>
+            ชื่อที่ต่างกันแค่ตัวพิมพ์เล็ก/ใหญ่ เว้นวรรค หรือ _ . - นับเป็นคนเดียวกัน
+          </p>
+        </div>
+      </div>
+      <!-- ========== /TAB: สถิติ ========== -->
+
       <!-- Toast -->
       <div id="toast" class="fixed left-1/2 -translate-x-1/2 z-50 hidden" style="bottom: calc(1.5rem + env(safe-area-inset-bottom));">
         <div class="glass rounded-xl px-5 py-3 text-sm font-medium text-center max-w-xs"></div>
@@ -203,7 +280,7 @@
   <script src="../firebase-config.js"></script>
   <script src="../shared/firebase-init.js?v=2"></script>
   <script src="../shared/data.js?v=2"></script>
-  <script src="../shared/admin-data.js?v=2"></script>
+  <script src="../shared/admin-data.js?v=3"></script>
   <script src="../shared/crowd-grid.js?v=2"></script>
 
   <script>
@@ -252,12 +329,14 @@
     // แท็บ
     // ============================================================
     function switchTab(tabId) {
-      ['tabSetup', 'tabDraw', 'tabData'].forEach(function(id) {
+      ['tabSetup', 'tabDraw', 'tabData', 'tabStats'].forEach(function(id) {
         document.getElementById(id).classList.toggle('hidden', id !== tabId);
       });
       document.querySelectorAll('.tab-btn').forEach(function(btn) {
         btn.classList.toggle('active', btn.dataset.tab === tabId);
       });
+      // โหลดสถิติครั้งแรกที่เปิดแท็บ — ครั้งต่อไปใช้ของเดิมจนกดรีเฟรช
+      if (tabId === 'tabStats' && !statsRounds && !isLoadingStats) loadStats();
     }
 
     // ============================================================
@@ -951,6 +1030,275 @@
         btn.disabled = false; btn.textContent = 'รีเซ็ตกิจกรรม';
       }
     }
+
+    // ============================================================
+    // แท็บสถิติ — โหลดข้อมูลดิบรายรอบครั้งเดียว แล้วรวมยอด/กรองช่วงเวลาฝั่งหน้าเว็บ
+    // ============================================================
+    const STATS_DAY = 86400000;
+    let statsRounds = null;     // ข้อมูลดิบจาก EPAdmin.getDashboardStats()
+    let statsView = [];         // รอบที่ผ่านตัวกรองช่วงเวลา
+    let statsAgg = null;
+    let statsRange = 'all';
+    let statsSortKey = 'prizes';
+    let statsSortDir = -1;
+    let statsOpenKey = null;
+    let isLoadingStats = false;
+
+    async function loadStats() {
+      if (isLoadingStats) return;
+      isLoadingStats = true;
+      const btn = document.getElementById('btnStatsRefresh');
+      btn.disabled = true;
+      document.getElementById('statsLoading').classList.remove('hidden');
+      try {
+        statsRounds = await EPAdmin.getDashboardStats();
+        document.getElementById('statsUpdated').textContent =
+          'อัปเดตล่าสุด ' + new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
+        renderStats();
+      } catch (err) {
+        showToast('โหลดสถิติไม่สำเร็จ: ' + (err.message || err), true);
+      } finally {
+        isLoadingStats = false;
+        btn.disabled = false;
+        document.getElementById('statsLoading').classList.add('hidden');
+      }
+    }
+
+    function setStatsRange(range) {
+      statsRange = range;
+      document.querySelectorAll('#tabStats [data-range]').forEach(function (b) {
+        b.classList.toggle('on', b.dataset.range === range);
+      });
+      if (statsRounds) renderStats();
+    }
+
+    function setStatsSort(key) {
+      statsSortDir = key === statsSortKey ? -statsSortDir : (key === 'ign' ? 1 : -1);
+      statsSortKey = key;
+      renderStatsPlayers();
+    }
+
+    // รวมยอดรายคน — จัดกลุ่มด้วย normalizeIgn ตัวเดียวกับที่ใช้กันชื่อซ้ำตอนส่งคำตอบ
+    // ชื่อที่แสดงใช้ชื่อล่าสุดที่คนนั้นพิมพ์ (rounds เรียงเก่า→ใหม่อยู่แล้ว)
+    function aggregateStats(rounds) {
+      const per = new Map();
+      let answers = 0, correct = 0, prizes = 0;
+      rounds.forEach(function (rd) {
+        rd.responses.forEach(function (x) {
+          const k = EPData.normalizeIgn(x.ign);
+          if (!k) return;
+          const p = per.get(k) || { key: k, ign: x.ign, answered: 0, correct: 0, wrong: 0, prizes: 0, hist: {} };
+          p.ign = x.ign;
+          p.answered++;
+          if (x.isCorrect) { p.correct++; correct++; } else { p.wrong++; }
+          p.hist[rd.id] = x.isCorrect ? 'ok' : 'no';
+          per.set(k, p);
+          answers++;
+        });
+        rd.winners.forEach(function (w) {
+          prizes++;
+          const p = per.get(EPData.normalizeIgn(w));
+          if (p) { p.prizes++; p.hist[rd.id] = 'win'; }
+        });
+      });
+      const players = Array.from(per.values());
+      players.forEach(function (p) { p.rate = p.answered ? p.correct / p.answered : 0; });
+      return { players: players, answers: answers, correct: correct, prizes: prizes };
+    }
+
+    function statsRoundLabel(rd) {
+      return rd.live ? 'รอบปัจจุบัน' : 'รอบที่ ' + (statsRounds.indexOf(rd) + 1);
+    }
+    function statsShortLabel(rd) {
+      return rd.live ? 'ตอนนี้' : '#' + (statsRounds.indexOf(rd) + 1);
+    }
+    function statsFmt(t, opts) {
+      return new Date(t).toLocaleString('th-TH', Object.assign({ timeZone: 'Asia/Bangkok' }, opts));
+    }
+
+    function renderStats() {
+      const now = Date.now();
+      statsView = statsRange === 'all'
+        ? statsRounds
+        : statsRounds.filter(function (r) { return r.at >= now - Number(statsRange) * STATS_DAY; });
+      statsAgg = aggregateStats(statsView);
+
+      const empty = statsView.length === 0;
+      document.getElementById('statsEmpty').classList.toggle('hidden', !empty);
+      document.getElementById('statsBody').classList.toggle('hidden', empty);
+      if (empty) return;
+
+      renderStatsKpis();
+      renderStatsChart();
+      renderStatsLeaderboard();
+      renderStatsPlayers();
+      renderStatsRounds();
+    }
+
+    function renderStatsKpis() {
+      const a = statsAgg, hasLive = statsView.some(function (r) { return r.live; });
+      const done = statsView.length - (hasLive ? 1 : 0);
+      document.getElementById('kRounds').innerHTML = statsView.length + '<small>รอบ</small>';
+      document.getElementById('kRoundsSub').textContent = hasLive ? 'จบแล้ว ' + done + ' · กำลังเล่น 1' : 'จบแล้วทั้งหมด';
+      document.getElementById('kPrizes').innerHTML = a.prizes + '<small>รางวัล</small>';
+      document.getElementById('kPrizesSub').textContent = 'ผู้ได้รับ ' + a.players.filter(function (p) { return p.prizes; }).length + ' คน';
+      document.getElementById('kPlayers').innerHTML = a.players.length + '<small>คน</small>';
+      document.getElementById('kPlayersSub').textContent = 'ส่งคำตอบรวม ' + a.answers + ' ครั้ง';
+      document.getElementById('kRate').innerHTML = Math.round(a.correct / Math.max(1, a.answers) * 100) + '<small>%</small>';
+      document.getElementById('kRateSub').textContent = 'ถูก ' + a.correct + ' · ผิด ' + (a.answers - a.correct);
+    }
+
+    function renderStatsChart() {
+      const data = statsView.slice(-12);
+      const W = 340, H = 170, L = 26, R = 4, T = 10, B = 22;
+      const max = Math.max(1, Math.max.apply(null, data.map(function (d) { return d.responses.length; })));
+      const step = max <= 5 ? 1 : max <= 25 ? 5 : 10;
+      const top = Math.ceil(max / step) * step;
+      const y = function (v) { return T + (H - T - B) * (1 - v / top); };
+      const slot = (W - L - R) / data.length, bw = Math.min(16, slot * 0.55);
+      let s = '';
+      for (let v = 0; v <= top; v += step) {
+        s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="rgba(43,36,27,0.07)" stroke-width="1"/>';
+        s += '<text x="' + (L - 6) + '" y="' + (y(v) + 3) + '" text-anchor="end" font-size="9" fill="var(--ink-faint)">' + v + '</text>';
+      }
+      data.forEach(function (d, i) {
+        const ok = d.responses.filter(function (x) { return x.isCorrect; }).length, no = d.responses.length - ok;
+        const x = L + slot * i + (slot - bw) / 2, base = y(0), yOk = y(ok), yAll = y(ok + no);
+        // ตอบถูกติดฐาน ตอบผิดซ้อนด้านบน เว้นช่อง 2px
+        if (ok) s += '<rect x="' + x + '" y="' + yOk + '" width="' + bw + '" height="' + (base - yOk) + '" rx="3" fill="var(--sage)"/>';
+        if (no) s += '<rect x="' + x + '" y="' + yAll + '" width="' + bw + '" height="' + Math.max(0, yOk - yAll - (ok ? 2 : 0)) + '" rx="3" fill="rgba(177,69,60,0.55)"/>';
+        s += '<text x="' + (x + bw / 2) + '" y="' + (H - 6) + '" text-anchor="middle" font-size="9" fill="' + (d.live ? 'var(--sage)' : 'var(--ink-faint)') + '">' + statsShortLabel(d) + '</text>';
+        s += '<rect class="st-hit" data-i="' + i + '" x="' + (L + slot * i) + '" y="' + T + '" width="' + slot + '" height="' + (H - T - B) + '" fill="transparent" style="cursor:pointer"/>';
+      });
+      const svg = document.getElementById('statsChart');
+      const tip = document.getElementById('statsTip');
+      const box = document.getElementById('statsChartBox');
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      svg.innerHTML = s;
+      tip.classList.add('hidden');
+      svg.querySelectorAll('.st-hit').forEach(function (h) {
+        function show() {
+          const d = data[+h.dataset.i], ok = d.responses.filter(function (x) { return x.isCorrect; }).length;
+          tip.innerHTML = '<b>' + statsRoundLabel(d) + '</b> · ' + statsFmt(d.at, { day: 'numeric', month: 'short' }) +
+            '<br>ตอบ ' + d.responses.length + ' คน · ถูก ' + ok + ' · ผิด ' + (d.responses.length - ok) +
+            '<br>รางวัล ' + d.winners.length + '/' + d.prizeCount;
+          const r = h.getBoundingClientRect(), b = box.getBoundingClientRect();
+          tip.style.left = Math.min(Math.max(r.left - b.left + r.width / 2, 75), b.width - 75) + 'px';
+          tip.style.top = '0px';
+          tip.classList.remove('hidden');
+          svg.querySelectorAll('.st-hit').forEach(function (o) { o.setAttribute('fill', o === h ? 'rgba(179,131,60,0.08)' : 'transparent'); });
+        }
+        h.addEventListener('mouseenter', show);
+        h.addEventListener('click', show);
+      });
+      svg.onmouseleave = function () {
+        tip.classList.add('hidden');
+        svg.querySelectorAll('.st-hit').forEach(function (o) { o.setAttribute('fill', 'transparent'); });
+      };
+    }
+
+    function renderStatsLeaderboard() {
+      const ranked = statsAgg.players.filter(function (p) { return p.prizes; })
+        .sort(function (a, b) { return b.prizes - a.prizes || b.rate - a.rate; });
+      document.getElementById('statsLbEmpty').classList.toggle('hidden', ranked.length > 0);
+      const person = function (sz) {
+        return '<svg class="person" width="' + sz + '" height="' + sz + '" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>';
+      };
+      const crown = '<svg class="st-crown" width="22" height="16" viewBox="0 0 24 16"><path d="M2 14 L4 3 L9 8 L12 1 L15 8 L20 3 L22 14 Z" fill="#d1a052" stroke="#8f6427" stroke-width="1.2" stroke-linejoin="round"/></svg>';
+      const order = [ranked[1], ranked[0], ranked[2]], heights = [70, 92, 56], labels = ['อันดับ 2', 'อันดับ 1', 'อันดับ 3'];
+      document.getElementById('statsPodium').innerHTML = ranked.length ? order.map(function (p, i) {
+        if (!p) return '<div></div>';
+        return '<div class="st-pod' + (i === 1 ? ' first' : '') + '">' +
+          '<div class="st-avatar">' + (i === 1 ? crown : '') + person(i === 1 ? 28 : 22) + '</div>' +
+          '<div class="name">' + escHtml(p.ign) + '</div>' +
+          '<div class="st-step" style="height:' + heights[i] + 'px"><span class="rk">' + labels[i] + '</span><span class="c st-num">' + p.prizes + '</span><span class="l">รางวัล</span></div>' +
+          '</div>';
+      }).join('') : '';
+      const max = ranked.length ? ranked[0].prizes : 1;
+      document.getElementById('statsRanks').innerHTML = ranked.slice(3, 10).map(function (p, i) {
+        return '<li><span class="r st-num">' + (i + 4) + '</span><span class="n">' + escHtml(p.ign) + '</span>' +
+          '<span class="st-track"><span class="st-fill" style="width:' + (p.prizes / max * 100) + '%"></span></span>' +
+          '<span class="c st-num">' + p.prizes + '</span></li>';
+      }).join('');
+    }
+
+    function renderStatsPlayers() {
+      if (!statsAgg) return;
+      const q = EPData.normalizeIgn(document.getElementById('statsSearch').value);
+      const list = statsAgg.players.filter(function (p) { return !q || p.key.indexOf(q) !== -1; })
+        .sort(function (a, b) {
+          const va = a[statsSortKey], vb = b[statsSortKey];
+          const c = typeof va === 'string' ? va.localeCompare(vb, 'th') : va - vb;
+          return c * statsSortDir || b.answered - a.answered;
+        });
+
+      document.querySelectorAll('#tabStats [data-sort]').forEach(function (b) {
+        const on = b.dataset.sort === statsSortKey;
+        b.classList.toggle('on', on);
+        b.textContent = b.textContent.replace(/ [▾▴]$/, '') + (on ? (statsSortDir < 0 ? ' ▾' : ' ▴') : '');
+      });
+      document.getElementById('statsPlSub').textContent = list.length + ' คน · แตะเพื่อดูรายรอบ';
+
+      const rowsEl = document.getElementById('statsRows');
+      if (!list.length) {
+        rowsEl.innerHTML = '<p class="text-xs text-gold-dim text-center py-3">ไม่พบชื่อที่ค้นหา</p>';
+        return;
+      }
+      const trophy = '<svg width="12" height="12" viewBox="0 0 24 24" fill="var(--gold)"><path d="M7 3h10v4a5 5 0 0 1-10 0V3Z"/><path d="M5 4H3v2a4 4 0 0 0 4 4M19 4h2v2a4 4 0 0 1-4 4" fill="none" stroke="var(--gold)" stroke-width="2"/><path d="M10 13h4v4h-4zM8 19h8v2H8z"/></svg>';
+      rowsEl.innerHTML = list.map(function (p) {
+        const open = p.key === statsOpenKey;
+        let html = '<div class="st-row' + (open ? ' open' : '') + '" data-k="' + escHtml(p.key) + '" tabindex="0" role="button" aria-expanded="' + open + '">' +
+          '<span class="ign">' + escHtml(p.ign) + '</span>' +
+          '<span class="cnt st-num">' + p.answered + '</span>' +
+          '<span class="st-split"><span class="bar">' +
+            (p.correct ? '<i style="width:' + (p.correct / p.answered * 100) + '%;background:var(--sage)"></i>' : '') +
+            (p.wrong ? '<i style="flex:1;background:rgba(177,69,60,0.55)"></i>' : '') +
+          '</span><span class="txt st-num"><b>' + p.correct + '</b><span>' + Math.round(p.rate * 100) + '%</span><em>' + p.wrong + '</em></span></span>' +
+          '<span class="st-prize st-num' + (p.prizes ? '' : ' zero') + '">' + (p.prizes ? trophy + p.prizes : '–') + '</span>' +
+          '</div>';
+        if (open) {
+          const won = statsView.filter(function (r) { return p.hist[r.id] === 'win'; }).map(statsShortLabel);
+          html += '<div class="st-detail">' +
+            '<div class="meta"><span>เข้าร่วม ' + p.answered + '/' + statsView.length + ' รอบ</span><span>ถูก ' + p.correct + ' · ผิด ' + p.wrong + '</span><span>ได้รางวัลรอบ ' + (won.join(', ') || '–') + '</span></div>' +
+            '<div class="st-dots">' + statsView.map(function (r) {
+              const h = p.hist[r.id];
+              const cls = h === 'win' ? 'st-d-win' : h === 'ok' ? 'st-d-ok' : h === 'no' ? 'st-d-no' : 'st-d-skip';
+              return '<i class="' + cls + '" title="' + statsRoundLabel(r) + '">' + (h === 'win' ? '★' : '') + '</i>';
+            }).join('') + '</div>' +
+            '<div class="st-dots-legend"><span><i class="st-d-win"></i>ได้รางวัล</span><span><i class="st-d-ok"></i>ถูก</span><span><i class="st-d-no"></i>ผิด</span><span><i class="st-d-skip"></i>ไม่ได้เล่น</span></div>' +
+            '</div>';
+        }
+        return html;
+      }).join('');
+    }
+
+    function renderStatsRounds() {
+      document.getElementById('statsRounds').innerHTML = statsView.slice().reverse().map(function (r) {
+        const ok = r.responses.filter(function (x) { return x.isCorrect; }).length;
+        return '<div class="st-round">' +
+          '<div class="top"><span>' + statsRoundLabel(r) + ' · ' + statsFmt(r.at, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) + '</span>' +
+            (r.live ? '<span style="color:var(--sage);font-weight:600">● กำลังเล่น</span>' : '<span>เฉลย <span class="st-ans">' + escHtml(OPTION_TH[r.correctAnswer] || r.correctAnswer || '-') + '</span></span>') + '</div>' +
+          '<div class="q">' + escHtml(r.question) + '</div>' +
+          '<div class="stats st-num"><span>ตอบ <b>' + r.responses.length + '</b></span><span>ถูก <b style="color:var(--sage)">' + ok + '</b></span><span>ผิด <b style="color:var(--rose)">' + (r.responses.length - ok) + '</b></span><span>รางวัล <b>' + r.winners.length + '/' + r.prizeCount + '</b></span></div>' +
+          (r.winners.length ? '<div class="st-wchips">' + r.winners.map(function (w) { return '<span class="st-wchip">' + escHtml(w) + '</span>'; }).join('') + '</div>' : '') +
+          '</div>';
+      }).join('');
+    }
+
+    const OPTION_TH = { A: 'ก.', B: 'ข.', C: 'ค.', D: 'ง.' };
+
+    document.getElementById('statsRows').addEventListener('click', function (e) {
+      const row = e.target.closest('.st-row');
+      if (!row) return;
+      statsOpenKey = statsOpenKey === row.dataset.k ? null : row.dataset.k;
+      renderStatsPlayers();
+    });
+    document.getElementById('statsRows').addEventListener('keydown', function (e) {
+      if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('st-row')) {
+        e.preventDefault();
+        e.target.click();
+      }
+    });
 
     // ============================================================
     // Utils

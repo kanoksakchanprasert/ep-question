@@ -410,7 +410,62 @@ const EPAdmin = (function () {
     return { success: true, message: 'รีเซ็ตกิจกรรมเรียบร้อย — ข้อมูลเดิมถูกสำรองลง History แล้ว' };
   }
 
+  // ============================================================
+  // ข้อมูลดิบรายรอบสำหรับแท็บสถิติ — history ทุกรอบ + รอบปัจจุบัน (ยังไม่ archive)
+  // คืนเป็นข้อมูลดิบ ให้หน้าเว็บรวมยอดเอง จะได้กรองช่วงเวลาได้โดยไม่ต้องโหลดใหม่
+  // ไม่ใช้ collectionGroup('responses') เพราะต้องเพิ่ม rule {path=**}/responses ซึ่งจะไปครอบ
+  // collection responses ระดับบนด้วย — guild ขนาดนี้ดึงทีละรอบแบบขนานก็พอ
+  // ============================================================
+  async function getDashboardStats() {
+    const histSnap = await HISTORY.get();
+    const rounds = await Promise.all(histSnap.docs.map(async function (doc) {
+      const d = doc.data();
+      const respSnap = await doc.ref.collection('responses').get();
+      const responses = [];
+      respSnap.forEach(function (r) {
+        const x = r.data();
+        responses.push({ ign: x.ign, isCorrect: !!x.isCorrect });
+      });
+      return {
+        id: doc.id,
+        at: Number(doc.id) || 0, // roundId = Date.now() ตอน archive
+        question: d.question || '',
+        correctAnswer: d.correctAnswer || '',
+        prizeCount: parseInt(d.prizeCount) || 1,
+        winners: d.winners || [],
+        responses: responses,
+        live: false
+      };
+    }));
+
+    const configSnap = await STATE.doc('config').get();
+    const config = configSnap.exists ? configSnap.data() : null;
+    if (config && config.status !== 'NoData' && config.question) {
+      const correctUpper = String(await getSecureCorrectAnswer()).trim().toUpperCase();
+      const respSnap = await RESPONSES.get();
+      const responses = [];
+      respSnap.forEach(function (r) {
+        const x = r.data();
+        responses.push({ ign: x.ign, isCorrect: String(x.answer || '').trim().toUpperCase() === correctUpper });
+      });
+      rounds.push({
+        id: 'live',
+        at: Date.now(),
+        question: config.question,
+        correctAnswer: correctUpper,
+        prizeCount: parseInt(config.prizeCount) || 1,
+        winners: await getCurrentWinnersList(),
+        responses: responses,
+        live: true
+      });
+    }
+
+    rounds.sort(function (a, b) { return a.at - b.at; });
+    return rounds;
+  }
+
   return {
+    getDashboardStats: getDashboardStats,
     signIn: signIn,
     signOut: signOut,
     onAuthChange: onAuthChange,
